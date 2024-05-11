@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "141083185911",
+    "firebase_url": "https://social-media-gamer-1afc9-default-rtdb.firebaseio.com",
+    "project_id": "social-media-gamer-1afc9",
+    "storage_bucket": "social-media-gamer-1afc9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141083185911:android:d1662ca78cbd1a9f07f9f2",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141083185911-1ogq4lib4btdh5hnkd97e1vi1qej5kn6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6m_E0nip17MD-bOd5-9s8cGTQe5sB8D8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141083185911-1ogq4lib4btdh5hnkd97e1vi1qej5kn6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141083185911:android:fd8f4642d5485da107f9f2",
+        "android_client_info": {
+          "package_name": "com.optic.socialmediagamer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141083185911-1ogq4lib4btdh5hnkd97e1vi1qej5kn6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6m_E0nip17MD-bOd5-9s8cGTQe5sB8D8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141083185911-1ogq4lib4btdh5hnkd97e1vi1qej5kn6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
