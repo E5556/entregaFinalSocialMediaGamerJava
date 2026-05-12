@@ -64,6 +64,8 @@
         <activity android:name=".activities.CommunityDetailActivity" />
         <activity android:name=".activities.EventDetailActivity" />
         <activity android:name=".activities.GroupChatActivity" />
+        <activity android:name=".activities.MyCollectionsActivity" />
+        <activity android:name=".activities.CollectionDetailActivity" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

@@ -34,14 +34,17 @@ import com.optic.socialmediagamer.models.Poll;
 import com.optic.socialmediagamer.providers.PollProvider;
 import com.optic.socialmediagamer.providers.ReactionsProvider;
 import com.optic.socialmediagamer.providers.TwitchProvider;
+import com.optic.socialmediagamer.providers.CollectionsProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
 import com.optic.socialmediagamer.providers.UsersProvider;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.ViewHolder> {
@@ -58,6 +61,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
     PostProvider mPostProvider;
     XPProvider mXPProvider;
     PollProvider mPollProvider;
+    CollectionsProvider mCollectionsProvider;
 
     private final Map<String, ListenerRegistration> mReactionListeners = new HashMap<>();
     private final Map<String, ListenerRegistration> mPollListeners = new HashMap<>();
@@ -74,6 +78,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         mPostProvider          = new PostProvider();
         mXPProvider            = new XPProvider();
         mPollProvider          = new PollProvider();
+        mCollectionsProvider   = new CollectionsProvider();
     }
 
     @Override
@@ -193,6 +198,10 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                 });
             });
         }
+
+        // Botón guardar en colección
+        String myUid = mAuthProvider.getUid();
+        holder.textViewSavePost.setOnClickListener(v -> showSaveToCollectionDialog(idPost, myUid));
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, PostDetailActivity.class);
@@ -350,6 +359,55 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         popup.showAsDropDown(anchor, 0, -anchor.getHeight() - 60, Gravity.START);
     }
 
+    private void showSaveToCollectionDialog(String postId, String userId) {
+        if (userId == null) return;
+        mCollectionsProvider.getByUser(userId).get().addOnSuccessListener(snap -> {
+            List<com.optic.socialmediagamer.models.Collection> cols = new ArrayList<>();
+            for (DocumentSnapshot doc : snap.getDocuments()) {
+                com.optic.socialmediagamer.models.Collection col =
+                        doc.toObject(com.optic.socialmediagamer.models.Collection.class);
+                if (col != null) { col.setId(doc.getId()); cols.add(col); }
+            }
+
+            String[] names = new String[cols.size() + 1];
+            for (int i = 0; i < cols.size(); i++) names[i] = "📂 " + cols.get(i).getName();
+            names[cols.size()] = "＋ Nueva colección";
+
+            new android.app.AlertDialog.Builder(context)
+                    .setTitle("Guardar en colección")
+                    .setItems(names, (d, which) -> {
+                        if (which < cols.size()) {
+                            mCollectionsProvider.addPost(cols.get(which).getId(), postId)
+                                    .addOnSuccessListener(v ->
+                                            android.widget.Toast.makeText(context, "Guardado en \"" + cols.get(which).getName() + "\"", android.widget.Toast.LENGTH_SHORT).show());
+                        } else {
+                            android.widget.EditText input = new android.widget.EditText(context);
+                            input.setHint("Nombre de la colección");
+                            new android.app.AlertDialog.Builder(context)
+                                    .setTitle("Nueva colección")
+                                    .setView(input)
+                                    .setPositiveButton("Crear", (d2, w2) -> {
+                                        String name = input.getText().toString().trim();
+                                        if (name.isEmpty()) return;
+                                        mCollectionsProvider.create(userId, name)
+                                                .addOnSuccessListener(v ->
+                                                    mCollectionsProvider.getByUser(userId).get()
+                                                        .addOnSuccessListener(snap2 -> {
+                                                            if (snap2.getDocuments().isEmpty()) return;
+                                                            DocumentSnapshot newest = snap2.getDocuments().get(0);
+                                                            mCollectionsProvider.addPost(newest.getId(), postId)
+                                                                .addOnSuccessListener(v2 ->
+                                                                    android.widget.Toast.makeText(context, "Guardado en \"" + name + "\"", android.widget.Toast.LENGTH_SHORT).show());
+                                                        }));
+                                    })
+                                    .setNegativeButton("Cancelar", null)
+                                    .show();
+                        }
+                    })
+                    .show();
+        });
+    }
+
     private void toggleReaction(String idPost, String myId, String emoji, boolean alreadyReacted) {
         if (alreadyReacted) {
             mReactionsProvider.unreact(myId, idPost, emoji);
@@ -391,6 +449,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         TextView textViewLiveDot;
         TextView textViewAddReaction;
         TextView textViewReactionsSummary;
+        TextView textViewSavePost;
         LinearLayout layoutPollCard;
         TextView textViewPollOptionA;
         TextView textViewPollOptionB;
@@ -418,6 +477,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             textViewLiveDot         = view.findViewById(R.id.textViewLiveDot);
             textViewAddReaction      = view.findViewById(R.id.textViewAddReaction);
             textViewReactionsSummary = view.findViewById(R.id.textViewReactionsSummary);
+            textViewSavePost         = view.findViewById(R.id.textViewSavePost);
             layoutPollCard           = view.findViewById(R.id.layoutPollCard);
             textViewPollOptionA      = view.findViewById(R.id.textViewPollOptionA);
             textViewPollOptionB      = view.findViewById(R.id.textViewPollOptionB);
