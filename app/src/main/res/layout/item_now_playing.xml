@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/color_surface"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circleImageNowPlaying"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:src="@drawable/ic_person"
+            app:civ_border_color="@color/color_primary"
+            app:civ_border_width="2dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/textViewNowPlayingUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@gamer"
+                android:textColor="@color/color_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="3dp">
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@color/color_secondary"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/textViewNowPlayingGame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="jugando Valorant"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageViewNowPlayingChat"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_chat"
+            android:padding="6dp"
+            android:alpha="0.7" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
