@@ -23,9 +23,11 @@ import com.optic.socialmediagamer.providers.FollowProvider;
 import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.providers.ChallengesProvider;
 import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.ReputationProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
+import com.optic.socialmediagamer.models.Challenge;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
 import com.squareup.picasso.Picasso;
@@ -53,6 +55,7 @@ public class UserProfileActivity extends AppCompatActivity {
     NotificationsProvider mNotificationsProvider;
     XPProvider mXPProvider;
     ReputationProvider mReputationProvider;
+    ChallengesProvider mChallengesProvider;
     PostsAdapter mPostsAdapter;
 
     String mIdUser;
@@ -82,10 +85,19 @@ public class UserProfileActivity extends AppCompatActivity {
         mNotificationsProvider = new NotificationsProvider();
         mXPProvider = new XPProvider();
         mReputationProvider = new ReputationProvider();
+        mChallengesProvider = new ChallengesProvider();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mCircleImageBack.setOnClickListener(v -> finish());
         mButtonFollow.setOnClickListener(v -> toggleFollow());
+
+        // Challenge button (only for other users)
+        Button btnChallenge = findViewById(R.id.btnChallenge);
+        String myId = mAuthProvider.getUid();
+        if (myId != null && !myId.equals(mIdUser)) {
+            btnChallenge.setVisibility(View.VISIBLE);
+            btnChallenge.setOnClickListener(v -> showChallengeDialog());
+        }
 
         loadUserData();
         loadPostCount();
@@ -120,6 +132,30 @@ public class UserProfileActivity extends AppCompatActivity {
         mFollowProvider.getFollowers(mIdUser).get().addOnSuccessListener(snap -> {
             mTextViewFollowersCount.setText(String.valueOf(snap.size()));
         });
+    }
+
+    private void showChallengeDialog() {
+        android.widget.EditText et = new android.widget.EditText(this);
+        et.setHint("Describe el desafío (ej: primero en llegar a Gold)");
+        et.setPadding(48, 24, 48, 8);
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("⚔️ Enviar desafío")
+                .setView(et)
+                .setPositiveButton("ENVIAR", (d, w) -> {
+                    String desc = et.getText().toString().trim();
+                    if (desc.isEmpty()) { Toast.makeText(this, "Escribe el desafío", Toast.LENGTH_SHORT).show(); return; }
+                    String senderId = mAuthProvider.getUid();
+                    Challenge c = new Challenge();
+                    c.setIdChallenger(senderId);
+                    c.setIdChallenged(mIdUser);
+                    c.setDescription(desc);
+                    c.setTimestamp(System.currentTimeMillis());
+                    mChallengesProvider.send(c).addOnSuccessListener(u ->
+                            Toast.makeText(this, "¡Desafío enviado! ⚔️", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void loadReputation() {

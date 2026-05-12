@@ -70,6 +70,8 @@
         <activity android:name=".activities.WeeklyMissionsActivity" />
         <activity android:name=".activities.CreateTournamentActivity" />
         <activity android:name=".activities.TournamentDetailActivity" />
+        <activity android:name=".activities.MyChallengesActivity" />
+        <activity android:name=".activities.ChallengeDetailActivity" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarChallenges"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:title="⚔️ Mis Desafíos"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutChallenges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_surface" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewChallenges"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false" />
+
+    <TextView
+        android:id="@+id/textViewChallengesEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sin desafíos aquí todavía ⚔️"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:padding="40dp"
+        android:visibility="gone" />
+
+</LinearLayout>
