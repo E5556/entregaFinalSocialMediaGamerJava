@@ -1,22 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="10dp"
-    app:cardCornerRadius="10dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/color_surface"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical">
+
+        <!-- Fila del autor -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/circleImageAuthor"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_person" />
+
+            <TextView
+                android:id="@+id/textViewAuthorUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/color_text_primary"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:text="@gamer" />
+
+            <TextView
+                android:id="@+id/textViewAuthorRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textSize="14sp"
+                android:text="🥉" />
+
+            <TextView
+                android:id="@+id/textViewLiveDot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="🔴"
+                android:textSize="10sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_divider" />
 
         <ImageView
             android:id="@+id/imageViewPostCard"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:scaleType="centerCrop"
-            />
+            android:layout_height="160dp"
+            android:scaleType="centerCrop" />
+
+        <!-- Borde superior neón -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_divider" />
 
         <TextView
             android:id="@+id/textViewTitlePostCard"
@@ -24,19 +82,107 @@
             android:layout_height="wrap_content"
             android:text="Titulo del juego"
             android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:textSize="16dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="15sp"
             android:maxLines="1"
-            android:textColor="@color/colorDarkBlue"
-            />
+            android:textStyle="bold"
+            android:textColor="@color/color_text_primary" />
 
         <TextView
             android:id="@+id/textViewDescriptionPostCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Descripcion del juego..."
-            android:layout_margin="10dp" />
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="13sp"
+            android:maxLines="2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_divider" />
+
+        <!-- Fila likes y comentarios -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imageViewLike"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_heart_outline"
+                android:padding="2dp" />
+
+            <TextView
+                android:id="@+id/textViewLikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginStart="4dp" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_chat"
+                android:padding="2dp"
+                android:layout_marginStart="16dp" />
+
+            <TextView
+                android:id="@+id/textViewCommentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+        <!-- Fila de reacciones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="4dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/textViewAddReaction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🙂+"
+                android:textSize="18sp"
+                android:padding="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/textViewReactionsSummary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                android:textColor="@color/color_text_secondary"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
