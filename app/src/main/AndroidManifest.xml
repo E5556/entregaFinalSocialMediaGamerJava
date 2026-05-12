@@ -67,6 +67,7 @@
         <activity android:name=".activities.MyCollectionsActivity" />
         <activity android:name=".activities.CollectionDetailActivity" />
         <activity android:name=".activities.MatchPlayActivity" />
+        <activity android:name=".activities.WeeklyMissionsActivity" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

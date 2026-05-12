@@ -37,6 +37,7 @@ import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PollProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
@@ -341,6 +342,7 @@ public class PostActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 String myId = mAuthProvider.getUid();
                 mXPProvider.addXP(myId, RankHelper.XP_POST_CREATED);
+                new MissionsProvider().incrementProgress(myId, MissionsProvider.TYPE_POST);
                 notifyFollowers(myId, mTitle, post.getId());
 
                 if (withPoll) {

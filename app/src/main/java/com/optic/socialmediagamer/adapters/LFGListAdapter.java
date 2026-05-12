@@ -20,6 +20,7 @@ import com.optic.socialmediagamer.activities.GroupChatActivity;
 import com.optic.socialmediagamer.models.LFGPost;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.LFGProvider;
+import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 
 import java.util.ArrayList;
@@ -96,8 +97,10 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
                 mLFGProvider.leaveParty(lfgId, myId).addOnSuccessListener(u ->
                         Toast.makeText(context, "Saliste de la party", Toast.LENGTH_SHORT).show());
             } else if (!isFull) {
-                mLFGProvider.joinParty(lfgId, myId).addOnSuccessListener(u ->
-                        Toast.makeText(context, "¡Entraste a la party! 🎮", Toast.LENGTH_SHORT).show());
+                mLFGProvider.joinParty(lfgId, myId).addOnSuccessListener(u -> {
+                    Toast.makeText(context, "¡Entraste a la party! 🎮", Toast.LENGTH_SHORT).show();
+                    new MissionsProvider().incrementProgress(myId, MissionsProvider.TYPE_LFG);
+                });
             }
         });
 

@@ -34,6 +34,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.activities.EditProfileActivity;
 import com.optic.socialmediagamer.activities.MyCollectionsActivity;
+import com.optic.socialmediagamer.activities.WeeklyMissionsActivity;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.BadgeProvider;
 import com.optic.socialmediagamer.providers.FollowProvider;
@@ -150,6 +151,9 @@ public class ProfileFragment extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         mLinearLayoutEditProfile.setOnClickListener(view -> goToEditProfile());
+
+        mView.findViewById(R.id.layoutWeeklyMissions).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), WeeklyMissionsActivity.class)));
 
         mView.findViewById(R.id.layoutMyCollections).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), MyCollectionsActivity.class)));

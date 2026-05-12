@@ -35,6 +35,7 @@ import com.optic.socialmediagamer.providers.PollProvider;
 import com.optic.socialmediagamer.providers.ReactionsProvider;
 import com.optic.socialmediagamer.providers.TwitchProvider;
 import com.optic.socialmediagamer.providers.CollectionsProvider;
+import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
@@ -165,6 +166,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                             holder.imageViewLike.setImageResource(R.drawable.ic_heart);
                             mPostProvider.incrementLikeCount(idPost);
                             mXPProvider.addXP(myId, RankHelper.XP_LIKE_GIVEN);
+                            new MissionsProvider().incrementProgress(myId, MissionsProvider.TYPE_LIKE);
                             String postOwnerId2 = post.getIdUser();
                             if (postOwnerId2 != null && !myId.equals(postOwnerId2)) {
                                 mXPProvider.addXP(postOwnerId2, RankHelper.XP_LIKE_RECEIVED);
