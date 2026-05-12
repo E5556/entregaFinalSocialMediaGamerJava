@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarCreateClan"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:title="🛡️ Crear Clan"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/color_surface">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NOMBRE DEL CLAN"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextClanName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: Los Eternos"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TAG  (máx. 5 caracteres)"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextClanTag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: ETRNL"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:maxLength="5"
+                android:inputType="textNoSuggestions"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DESCRIPCIÓN"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextClanDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="¿De qué trata tu clan? Juegos, estilo de juego..."
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp" />
+
+            <Button
+                android:id="@+id/buttonCreateClan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🛡️ CREAR CLAN"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:backgroundTint="@color/color_primary"
+                android:textColor="@color/color_background" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarClanDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Header card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_surface"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/textViewClanName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:text="Nombre del Clan" />
+
+                <TextView
+                    android:id="@+id/textViewClanTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_primary"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"
+                    android:text="[TAG]" />
+
+                <TextView
+                    android:id="@+id/textViewClanDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginTop="8dp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/textViewMemberCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="6dp"
+                    android:text="0 miembros" />
+
+            </LinearLayout>
+
+            <!-- Edit description (leader only) -->
+            <LinearLayout
+                android:id="@+id/layoutEditDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="@color/color_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp">
+
+                <EditText
+                    android:id="@+id/editTextNewDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nueva descripción"
+                    android:textColor="@color/color_text_primary"
+                    android:textColorHint="@color/color_text_secondary"
+                    android:background="@color/color_surface_2"
+                    android:padding="10dp"
+                    android:inputType="textMultiLine"
+                    android:minLines="2" />
+
+                <Button
+                    android:id="@+id/buttonSaveDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GUARDAR"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/color_primary"
+                    android:textColor="@color/color_background"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+            <!-- Action buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/buttonJoinLeave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="UNIRSE"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/color_primary"
+                    android:textColor="@color/color_background"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/buttonEditDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="EDITAR DESC."
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/color_surface_2"
+                    android:textColor="@color/color_text_primary"
+                    android:visibility="gone"
+                    android:layout_marginStart="8dp" />
+
+                <Button
+                    android:id="@+id/buttonDeleteClan"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DISOLVER"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:backgroundTint="#B00020"
+                    android:textColor="@color/color_background"
+                    android:visibility="gone"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+            <!-- Members section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MIEMBROS"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutMembers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_surface"
+                android:padding="8dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
