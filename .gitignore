@@ -1,0 +1,21 @@
+# Credenciales - NUNCA subir al repositorio
+gradle.properties
+app/src/main/assets/service-account.json
+app/src/main/assets/service-account.json.json
+
+# Android
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
