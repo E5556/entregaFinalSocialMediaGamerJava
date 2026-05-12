@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarCreateLFG"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_surface"
+            android:title="Buscar Party"
+            android:titleTextColor="@color/color_text_primary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JUEGO"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextLFGGame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: Valorant, FIFA 25..."
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PLATAFORMA"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <Spinner
+                android:id="@+id/spinnerLFGPlatform"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/color_surface"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DESCRIPCIÓN"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextLFGDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="¿Qué buscas? Ej: Jugadores para ranked, micrófono obligatorio..."
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface"
+                android:padding="10dp"
+                android:minLines="3"
+                android:inputType="textMultiLine"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SLOTS (nº de jugadores que buscas)"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextLFGSlots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: 3"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface"
+                android:padding="10dp"
+                android:inputType="number"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HORARIO"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <Spinner
+                android:id="@+id/spinnerLFGSchedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/color_surface"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="24dp" />
+
+            <Button
+                android:id="@+id/buttonPublishLFG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="PUBLICAR BÚSQUEDA"
+                android:textStyle="bold"
+                android:backgroundTint="@color/color_primary"
+                android:textColor="@color/color_background"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

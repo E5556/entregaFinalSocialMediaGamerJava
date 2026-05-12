@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/color_surface"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/textViewLFGGame"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Valorant"
+                android:textColor="@color/color_text_primary"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textViewLFGPlatform"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PC"
+                android:textColor="@color/color_primary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:background="@color/color_surface_2"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewLFGDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Buscando 2 jugadores para ranked..."
+            android:textColor="@color/color_text_secondary"
+            android:textSize="13sp"
+            android:layout_marginTop="6dp"
+            android:maxLines="2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/textViewLFGSlots"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="👥 1/4 jugadores"
+                android:textColor="@color/color_text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewLFGAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@gamer"
+                android:textColor="@color/color_text_secondary"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewLFGSchedule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_secondary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:background="@color/color_surface_2"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:layout_marginTop="6dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textViewLFGPlayers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_primary"
+            android:textSize="12sp"
+            android:layout_marginTop="6dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/buttonJoinParty"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="UNIRSE A LA PARTY"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/color_primary"
+            android:textColor="@color/color_background"
+            android:layout_marginTop="10dp"
+            android:fontFamily="monospace" />
+
+        <Button
+            android:id="@+id/buttonLFGGroupChat"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="💬 CHAT GRUPAL"
+            android:textSize="12sp"
+            android:backgroundTint="@color/color_surface_2"
+            android:layout_marginTop="6dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

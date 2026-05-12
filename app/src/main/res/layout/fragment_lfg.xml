@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Barra de búsqueda -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/color_surface"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_search"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="6dp"
+                android:alpha="0.6" />
+
+            <EditText
+                android:id="@+id/editTextSearchLFG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Buscar juego o descripción..."
+                android:textSize="14sp"
+                android:textColor="@color/color_text_primary"
+                android:background="@null"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:singleLine="true"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+
+        </LinearLayout>
+
+        <!-- Chips de plataforma -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:background="@color/color_surface"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:id="@+id/layoutPlatformChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView android:id="@+id/chipAll"
+                    style="@style/LFGChip"
+                    android:text="Todos" />
+
+                <TextView android:id="@+id/chipPC"
+                    style="@style/LFGChip"
+                    android:text="PC" />
+
+                <TextView android:id="@+id/chipPS4"
+                    style="@style/LFGChip"
+                    android:text="PS4" />
+
+                <TextView android:id="@+id/chipXBOX"
+                    style="@style/LFGChip"
+                    android:text="XBOX" />
+
+                <TextView android:id="@+id/chipNintendo"
+                    style="@style/LFGChip"
+                    android:text="Nintendo" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <!-- Lista -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewLFG"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMatchPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_search"
+        app:backgroundTint="@color/color_secondary"
+        app:tint="@color/colorWhite"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="136dp"
+        app:fabSize="mini" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCreateLFG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:backgroundTint="@color/color_primary"
+        app:tint="@color/color_background"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="72dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
