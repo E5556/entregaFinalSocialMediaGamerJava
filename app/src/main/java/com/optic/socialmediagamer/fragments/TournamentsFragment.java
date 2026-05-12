@@ -17,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.activities.CreateTournamentActivity;
+import com.optic.socialmediagamer.activities.TournamentAlertsActivity;
 import com.optic.socialmediagamer.activities.TournamentDetailActivity;
 import com.optic.socialmediagamer.models.Tournament;
 import com.optic.socialmediagamer.providers.TournamentProvider;
@@ -42,6 +43,9 @@ public class TournamentsFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new TournamentAdapter(mTournaments);
         mRecyclerView.setAdapter(mAdapter);
+
+        FloatingActionButton fabAlerts = view.findViewById(R.id.fabTournamentAlerts);
+        fabAlerts.setOnClickListener(v -> startActivity(new Intent(getActivity(), TournamentAlertsActivity.class)));
 
         FloatingActionButton fab = view.findViewById(R.id.fabCreateTournament);
         fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), CreateTournamentActivity.class)));

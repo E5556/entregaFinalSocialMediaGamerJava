@@ -11,9 +11,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.optic.socialmediagamer.R;
+import com.optic.socialmediagamer.models.Notification;
 import com.optic.socialmediagamer.models.Tournament;
 import com.optic.socialmediagamer.providers.AuthProvider;
+import com.optic.socialmediagamer.providers.NotificationsProvider;
+import com.optic.socialmediagamer.providers.TournamentAlertProvider;
 import com.optic.socialmediagamer.providers.TournamentProvider;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +35,8 @@ public class CreateTournamentActivity extends AppCompatActivity {
 
     private final AuthProvider mAuthProvider = new AuthProvider();
     private final TournamentProvider mTournamentProvider = new TournamentProvider();
+    private final TournamentAlertProvider mAlertProvider = new TournamentAlertProvider();
+    private final NotificationsProvider mNotificationsProvider = new NotificationsProvider();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +94,25 @@ public class CreateTournamentActivity extends AppCompatActivity {
 
         mTournamentProvider.create(t).addOnSuccessListener(u -> {
             Toast.makeText(this, "¡Torneo creado! ⚔️", Toast.LENGTH_SHORT).show();
+            notifySubscribers(game, t.getIdUser());
             finish();
+        });
+    }
+
+    private void notifySubscribers(String game, String creatorId) {
+        mAlertProvider.getSubscribers(game).addOnSuccessListener(snap -> {
+            for (DocumentSnapshot doc : snap.getDocuments()) {
+                String subscriberId = doc.getString("userId");
+                if (subscriberId == null || subscriberId.equals(creatorId)) continue;
+                Notification n = new Notification();
+                n.setType("tournament_alert");
+                n.setIdFrom(creatorId);
+                n.setIdTo(subscriberId);
+                n.setBody("⚔️ Nuevo torneo de " + game + " disponible. ¡Inscríbete!");
+                n.setRead(false);
+                n.setTimestamp(System.currentTimeMillis());
+                mNotificationsProvider.save(n);
+            }
         });
     }
 

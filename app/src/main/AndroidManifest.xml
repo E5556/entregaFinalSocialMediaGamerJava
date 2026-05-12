@@ -75,6 +75,8 @@
         <activity android:name=".activities.ClansActivity" />
         <activity android:name=".activities.CreateClanActivity" />
         <activity android:name=".activities.ClanDetailActivity" />
+        <activity android:name=".activities.GamerCardActivity" />
+        <activity android:name=".activities.TournamentAlertsActivity" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"
