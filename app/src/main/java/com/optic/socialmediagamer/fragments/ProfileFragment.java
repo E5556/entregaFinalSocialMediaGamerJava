@@ -1,133 +1,333 @@
 package com.optic.socialmediagamer.fragments;
 
-import android.content.Intent; // Importa la clase Intent para cambiar de actividad
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater; // Importa las clases necesarias para inflar y manejar vistas
-import android.view.View; // Importa la clase View para trabajar con la interfaz de usuario
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.ImageView; // Importa la clase ImageView para mostrar imágenes
-import android.widget.LinearLayout; // Importa la clase LinearLayout para organizar vistas en una disposición lineal
-import android.widget.TextView; // Importa la clase TextView para mostrar texto
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener; // Importa la interfaz OnSuccessListener para manejar eventos de éxito en tareas
-import com.google.firebase.firestore.DocumentSnapshot; // Importa la clase DocumentSnapshot para representar un snapshot de un documento
-import com.google.firebase.firestore.QuerySnapshot; // Importa la clase QuerySnapshot para representar un conjunto de resultados de una consulta Firestore
-import com.optic.socialmediagamer.R; // Importa las constantes definidas en la clase R
-import com.optic.socialmediagamer.activities.EditProfileActivity; // Importa la actividad EditProfileActivity
-import com.optic.socialmediagamer.providers.AuthProvider; // Importa la clase AuthProvider para manejar la autenticación
-import com.optic.socialmediagamer.providers.PostProvider; // Importa la clase PostProvider para manejar las publicaciones
-import com.optic.socialmediagamer.providers.UsersProvider; // Importa la clase UsersProvider para manejar los usuarios
-import com.squareup.picasso.Picasso; // Importa la clase Picasso para cargar imágenes desde URL
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import de.hdodenhof.circleimageview.CircleImageView; // Importa la clase CircleImageView para mostrar una imagen de perfil circular
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
+import com.optic.socialmediagamer.adapters.BadgesAdapter;
+import com.optic.socialmediagamer.adapters.MyPostsAdapter;
+import com.optic.socialmediagamer.models.Badge;
+import com.optic.socialmediagamer.models.Post;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.optic.socialmediagamer.R;
+import com.optic.socialmediagamer.activities.EditProfileActivity;
+import com.optic.socialmediagamer.providers.AuthProvider;
+import com.optic.socialmediagamer.providers.BadgeProvider;
+import com.optic.socialmediagamer.providers.FollowProvider;
+import com.optic.socialmediagamer.providers.PostProvider;
+import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.providers.TwitchProvider;
+import com.optic.socialmediagamer.utils.RankHelper;
+import com.optic.socialmediagamer.utils.ThemeHelper;
+import com.squareup.picasso.Picasso;
+
+import androidx.appcompat.widget.SwitchCompat;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileFragment extends Fragment {
 
-    View mView; // Vista del fragmento
-    LinearLayout mLinearLayoutEditProfile; // Layout para el botón de edición de perfil
-    TextView mTextViewUsername; // TextView para el nombre de usuario
-    TextView mTextViewPhone; // TextView para el número de teléfono
-    TextView mTextViewEmail; // TextView para el correo electrónico
-    TextView mTextViewPostNumber; // TextView para el número de publicaciones
-    ImageView mImageViewCover; // ImageView para la imagen de portada
-    CircleImageView mCircleImageProfile; // CircleImageView para la imagen de perfil
+    View mView;
+    LinearLayout mLinearLayoutEditProfile;
+    TextView mTextViewUsername;
+    TextView mTextViewPhone;
+    TextView mTextViewEmail;
+    TextView mTextViewPostNumber;
+    ImageView mImageViewCover;
+    CircleImageView mCircleImageProfile;
 
-    UsersProvider mUsersProvider; // Proveedor de usuarios
-    AuthProvider mAuthProvider; // Proveedor de autenticación
-    PostProvider mPostProvider; // Proveedor de publicaciones
+    TextView mTextViewLiveBadge;
+    Button mButtonWatchStream;
+    TextView mTextViewRankEmoji;
+    TextView mTextViewRankName;
+    TextView mTextViewXP;
+    TextView mTextViewXPNextRank;
+    ProgressBar mProgressBarXP;
 
-    public ProfileFragment() {
-        // Constructor por defecto
-    }
+    RecyclerView mRecyclerView;
+    RecyclerView mRecyclerViewBadges;
+    MyPostsAdapter mMyPostsAdapter;
+    BadgesAdapter mBadgesAdapter;
+
+    TextView mTextViewFollowersCount;
+    TextView mTextViewFollowingCount;
+    TextView mTextViewNowPlayingDisplay;
+    LinearLayout mLayoutNowPlayingEdit;
+    EditText mEditTextNowPlaying;
+    TextView mBtnEditNowPlaying;
+    TextView mBtnSaveNowPlaying;
+    TextView mBtnClearNowPlaying;
+
+    UsersProvider mUsersProvider;
+    AuthProvider mAuthProvider;
+    PostProvider mPostProvider;
+    BadgeProvider mBadgeProvider;
+    FollowProvider mFollowProvider;
+
+    public ProfileFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Infla el diseño del fragmento
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
-        // Inicializa las vistas
         mLinearLayoutEditProfile = mView.findViewById(R.id.linearLayoutEditProfile);
-        mTextViewEmail = mView.findViewById(R.id.textViewEmail);
-        mTextViewUsername = mView.findViewById(R.id.textViewUsername);
-        mTextViewPhone = mView.findViewById(R.id.textViewphone);
-        mTextViewPostNumber = mView.findViewById(R.id.textViewPostNumber);
-        mCircleImageProfile = mView.findViewById(R.id.circleImageProfile);
-        mImageViewCover = mView.findViewById(R.id.imageViewCover);
+        mTextViewEmail           = mView.findViewById(R.id.textViewEmail);
+        mTextViewUsername        = mView.findViewById(R.id.textViewUsername);
+        mTextViewPhone           = mView.findViewById(R.id.textViewphone);
+        mTextViewPostNumber      = mView.findViewById(R.id.textViewPostNumber);
+        mCircleImageProfile      = mView.findViewById(R.id.circleImageProfile);
+        mImageViewCover          = mView.findViewById(R.id.imageViewCover);
+        mRecyclerView            = mView.findViewById(R.id.recyclerViewMyPosts);
+        mRecyclerViewBadges      = mView.findViewById(R.id.recyclerViewBadges);
+        mTextViewRankEmoji       = mView.findViewById(R.id.textViewRankEmoji);
+        mTextViewRankName        = mView.findViewById(R.id.textViewRankName);
+        mTextViewXP              = mView.findViewById(R.id.textViewXP);
+        mTextViewXPNextRank      = mView.findViewById(R.id.textViewXPNextRank);
+        mProgressBarXP           = mView.findViewById(R.id.progressBarXP);
+        mTextViewLiveBadge       = mView.findViewById(R.id.textViewLiveBadge);
+        mButtonWatchStream       = mView.findViewById(R.id.btnWatchStream);
+        mTextViewFollowersCount      = mView.findViewById(R.id.textViewProfileFollowers);
+        mTextViewFollowingCount      = mView.findViewById(R.id.textViewProfileFollowing);
+        mTextViewNowPlayingDisplay   = mView.findViewById(R.id.textViewNowPlayingDisplay);
+        mLayoutNowPlayingEdit        = mView.findViewById(R.id.layoutNowPlayingEdit);
+        mEditTextNowPlaying          = mView.findViewById(R.id.editTextNowPlaying);
+        mBtnEditNowPlaying           = mView.findViewById(R.id.btnEditNowPlaying);
+        mBtnSaveNowPlaying           = mView.findViewById(R.id.btnSaveNowPlaying);
+        mBtnClearNowPlaying          = mView.findViewById(R.id.btnClearNowPlaying);
 
-        // Configura un listener para el botón de edición de perfil
+        mBtnEditNowPlaying.setOnClickListener(v ->
+            mLayoutNowPlayingEdit.setVisibility(
+                mLayoutNowPlayingEdit.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
+
+        mBtnSaveNowPlaying.setOnClickListener(v -> {
+            String game = mEditTextNowPlaying.getText().toString().trim();
+            if (game.isEmpty()) { Toast.makeText(getContext(), "Escribe el nombre del juego", Toast.LENGTH_SHORT).show(); return; }
+            mUsersProvider.setNowPlaying(mAuthProvider.getUid(), game).addOnSuccessListener(u -> {
+                mTextViewNowPlayingDisplay.setText("🎮 " + game);
+                mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_primary));
+                mLayoutNowPlayingEdit.setVisibility(View.GONE);
+            });
+        });
+
+        mBtnClearNowPlaying.setOnClickListener(v ->
+            mUsersProvider.clearNowPlaying(mAuthProvider.getUid()).addOnSuccessListener(u -> {
+                mTextViewNowPlayingDisplay.setText("🎮 Sin juego activo");
+                mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_text_secondary));
+                mEditTextNowPlaying.setText("");
+                mLayoutNowPlayingEdit.setVisibility(View.GONE);
+            }));
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerViewBadges.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
         mLinearLayoutEditProfile.setOnClickListener(view -> goToEditProfile());
 
-        // Inicializa los proveedores
-        mUsersProvider = new UsersProvider();
-        mAuthProvider = new AuthProvider();
-        mPostProvider = new PostProvider();
+        SwitchCompat switchDarkMode = mView.findViewById(R.id.switchDarkMode);
+        switchDarkMode.setChecked(ThemeHelper.isDarkMode(requireContext()));
+        switchDarkMode.setOnCheckedChangeListener((btn, isChecked) ->
+                ThemeHelper.setDarkMode(requireContext(), isChecked));
 
-        // Obtiene la información del usuario y el número de publicaciones
+        mUsersProvider = new UsersProvider();
+        mAuthProvider  = new AuthProvider();
+        mPostProvider  = new PostProvider();
+        mBadgeProvider = new BadgeProvider();
+        mFollowProvider = new FollowProvider();
+
         getUser();
         getPostNumber();
+        loadBadges();
+        loadFollowCounts();
+        checkTimedBadges();
         return mView;
     }
 
-    // Método para abrir la actividad de edición de perfil
-    private void goToEditProfile() {
-        Intent intent = new Intent(getContext(), EditProfileActivity.class);
-        startActivity(intent);
+    @Override
+    public void onStart() {
+        super.onStart();
+        Query query = mPostProvider.getPostByUser(mAuthProvider.getUid());
+        FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
+                .setQuery(query, Post.class).build();
+        mMyPostsAdapter = new MyPostsAdapter(options, getContext());
+        mRecyclerView.setAdapter(mMyPostsAdapter);
+        mMyPostsAdapter.startListening();
     }
 
-    // Método para obtener el número de publicaciones del usuario actual
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mMyPostsAdapter != null) mMyPostsAdapter.stopListening();
+    }
+
+    private void goToEditProfile() {
+        startActivity(new Intent(getContext(), EditProfileActivity.class));
+    }
+
     private void getPostNumber() {
-        // Consulta las publicaciones del usuario actual y cuenta el número de documentos
-        mPostProvider.getPostByUser(mAuthProvider.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                int numberPost = queryDocumentSnapshots.size(); // Obtiene el número de publicaciones
-                mTextViewPostNumber.setText(String.valueOf(numberPost)); // Muestra el número de publicaciones en el TextView correspondiente
-            }
+        mPostProvider.getPostByUser(mAuthProvider.getUid()).get().addOnSuccessListener(snap -> {
+            int numberPost = snap.size();
+            mTextViewPostNumber.setText(String.valueOf(numberPost));
+            checkAndAwardBadges(numberPost);
         });
     }
 
-    // Método para obtener la información del usuario actual
+    private void checkAndAwardBadges(int postCount) {
+        String uid = mAuthProvider.getUid();
+        if (postCount >= 1) mBadgeProvider.awardIfMissing(uid, Badge.PRIMER_POST);
+
+        mPostProvider.getPostByUser(uid).get().addOnSuccessListener(snap -> {
+            long totalLikes = 0;
+            for (DocumentSnapshot doc : snap.getDocuments()) {
+                String category = doc.getString("category");
+                if ("PC".equals(category)) mBadgeProvider.awardIfMissing(uid, Badge.PC_FAN);
+                else if ("PS4".equals(category)) mBadgeProvider.awardIfMissing(uid, Badge.PS_FAN);
+                else if ("XBOX".equals(category)) mBadgeProvider.awardIfMissing(uid, Badge.XBOX_FAN);
+                else if ("Nintendo".equals(category)) mBadgeProvider.awardIfMissing(uid, Badge.NINTENDO_FAN);
+
+                Long likeCount = doc.getLong("likeCount");
+                if (likeCount != null) totalLikes += likeCount;
+            }
+            if (totalLikes >= 50) mBadgeProvider.awardIfMissing(uid, Badge.POPULAR);
+        });
+    }
+
+    private void checkTimedBadges() {
+        String uid = mAuthProvider.getUid();
+        mUsersProvider.getUser(uid).addOnSuccessListener(doc -> {
+            if (!doc.exists()) return;
+            Long accountTimestamp = doc.getLong("timestamp");
+            if (accountTimestamp != null) {
+                long days = (new Date().getTime() - accountTimestamp) / (1000 * 60 * 60 * 24);
+                if (days >= 30) mBadgeProvider.awardIfMissing(uid, Badge.VETERANO);
+            }
+        });
+
+        mFollowProvider.getFollowing(uid).get().addOnSuccessListener(snap -> {
+            if (snap.size() >= 10) mBadgeProvider.awardIfMissing(uid, Badge.SOCIAL);
+        });
+    }
+
+    private void loadBadges() {
+        mBadgeProvider.getBadgesByUser(mAuthProvider.getUid()).get().addOnSuccessListener(snap -> {
+            List<Badge> badges = new ArrayList<>();
+            for (DocumentSnapshot doc : snap.getDocuments()) {
+                Badge badge = doc.toObject(Badge.class);
+                if (badge != null) badges.add(badge);
+            }
+            mBadgesAdapter = new BadgesAdapter(badges);
+            mRecyclerViewBadges.setAdapter(mBadgesAdapter);
+        });
+    }
+
     private void getUser() {
-        // Obtiene el documento del usuario actual desde Firestore
         mUsersProvider.getUser(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) { // Si el documento existe
-                // Obtiene y muestra el correo electrónico, si está disponible
+            if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("email")) {
-                    String email = documentSnapshot.getString("email");
-                    mTextViewEmail.setText(email);
+                    mTextViewEmail.setText(documentSnapshot.getString("email"));
                 }
-                // Obtiene y muestra el número de teléfono, si está disponible
                 if (documentSnapshot.contains("phone")) {
-                    String phone = documentSnapshot.getString("phone");
-                    mTextViewPhone.setText(phone);
+                    mTextViewPhone.setText(documentSnapshot.getString("phone"));
                 }
-                // Obtiene y muestra el nombre de usuario, si está disponible
                 if (documentSnapshot.contains("username")) {
-                    String username = documentSnapshot.getString("username");
-                    mTextViewUsername.setText(username);
+                    mTextViewUsername.setText(documentSnapshot.getString("username"));
                 }
-                // Obtiene y muestra la imagen de perfil, si está disponible
                 if (documentSnapshot.contains("image_profile")) {
                     String imageProfile = documentSnapshot.getString("image_profile");
                     if (imageProfile != null && !imageProfile.isEmpty()) {
                         Picasso.get().load(imageProfile).into(mCircleImageProfile);
                     }
                 }
-                // Obtiene y muestra la imagen de portada, si está disponible
                 if (documentSnapshot.contains("image_cover")) {
                     String imageCover = documentSnapshot.getString("image_cover");
                     if (imageCover != null && !imageCover.isEmpty()) {
                         Picasso.get().load(imageCover).into(mImageViewCover);
                     }
                 }
+                long xp = documentSnapshot.getLong("xp") != null ? documentSnapshot.getLong("xp") : 0L;
+                updateXPUI(xp);
+
+                String nowPlaying = documentSnapshot.getString("nowPlaying");
+                if (nowPlaying != null && !nowPlaying.isEmpty()) {
+                    mTextViewNowPlayingDisplay.setText("🎮 " + nowPlaying);
+                    mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_primary));
+                    mEditTextNowPlaying.setText(nowPlaying);
+                }
+                String twitchUsername = documentSnapshot.getString("twitchUsername");
+                if (twitchUsername != null && !twitchUsername.isEmpty()) {
+                    new TwitchProvider().checkIfLive(twitchUsername, (isLive, viewers) -> {
+                        if (mTextViewLiveBadge == null) return;
+                        if (isLive) {
+                            mTextViewLiveBadge.setVisibility(View.VISIBLE);
+                            mTextViewLiveBadge.setText("🔴 EN VIVO · " + viewers + " espectadores");
+                            mButtonWatchStream.setVisibility(View.VISIBLE);
+                            mButtonWatchStream.setOnClickListener(v -> openTwitchStream(twitchUsername));
+                        } else {
+                            mTextViewLiveBadge.setVisibility(View.GONE);
+                            mButtonWatchStream.setVisibility(View.GONE);
+                        }
+                    });
+                }
             }
         });
+    }
+
+    private void loadFollowCounts() {
+        String uid = mAuthProvider.getUid();
+        mFollowProvider.getFollowers(uid).get().addOnSuccessListener(snap -> {
+            if (mTextViewFollowersCount != null)
+                mTextViewFollowersCount.setText(String.valueOf(snap.size()));
+        });
+        mFollowProvider.getFollowing(uid).get().addOnSuccessListener(snap -> {
+            if (mTextViewFollowingCount != null)
+                mTextViewFollowingCount.setText(String.valueOf(snap.size()));
+        });
+    }
+
+    private void openTwitchStream(String twitchUsername) {
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://www.twitch.tv/" + twitchUsername));
+        intent.setPackage("tv.twitch.android.app");
+        if (intent.resolveActivity(requireActivity().getPackageManager()) == null) {
+            intent.setPackage(null);
+        }
+        startActivity(intent);
+    }
+
+    private void updateXPUI(long xp) {
+        mTextViewRankEmoji.setText(RankHelper.getRankEmoji(xp));
+        mTextViewRankName.setText(RankHelper.getRankName(xp));
+        mTextViewXP.setText(xp + " XP");
+        mProgressBarXP.setProgress(RankHelper.getProgressPercent(xp));
+        long next = RankHelper.getNextRankXP(xp);
+        if (next == -1) {
+            mTextViewXPNextRank.setText("¡Rango máximo alcanzado!");
+        } else {
+            mTextViewXPNextRank.setText("Siguiente rango: " + next + " XP");
+        }
     }
 }

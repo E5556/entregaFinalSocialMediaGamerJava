@@ -101,6 +101,15 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                     }
                     long xp = userDoc.getLong("xp") != null ? userDoc.getLong("xp") : 0L;
                     holder.textViewAuthorRank.setText(RankHelper.getRankEmoji(xp));
+
+                    String nowPlaying = userDoc.getString("nowPlaying");
+                    if (nowPlaying != null && !nowPlaying.isEmpty()) {
+                        holder.textViewNowPlaying.setText("🎮 " + nowPlaying);
+                        holder.textViewNowPlaying.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.textViewNowPlaying.setVisibility(View.GONE);
+                    }
+
                     String twitch = userDoc.getString("twitchUsername");
                     if (twitch != null && !twitch.isEmpty()) {
                         new TwitchProvider().checkIfLive(twitch, (isLive, viewers) ->
@@ -378,6 +387,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         CircleImageView circleImageAuthor;
         TextView textViewAuthorUsername;
         TextView textViewAuthorRank;
+        TextView textViewNowPlaying;
         TextView textViewLiveDot;
         TextView textViewAddReaction;
         TextView textViewReactionsSummary;
@@ -404,6 +414,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             circleImageAuthor       = view.findViewById(R.id.circleImageAuthor);
             textViewAuthorUsername  = view.findViewById(R.id.textViewAuthorUsername);
             textViewAuthorRank      = view.findViewById(R.id.textViewAuthorRank);
+            textViewNowPlaying      = view.findViewById(R.id.textViewNowPlaying);
             textViewLiveDot         = view.findViewById(R.id.textViewLiveDot);
             textViewAddReaction      = view.findViewById(R.id.textViewAddReaction);
             textViewReactionsSummary = view.findViewById(R.id.textViewReactionsSummary);
