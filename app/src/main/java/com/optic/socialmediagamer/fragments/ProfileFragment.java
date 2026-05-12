@@ -68,6 +68,7 @@ public class ProfileFragment extends Fragment {
     TextView mTextViewRankName;
     TextView mTextViewXP;
     TextView mTextViewXPNextRank;
+    TextView mTextViewStreak;
     ProgressBar mProgressBarXP;
 
     RecyclerView mRecyclerView;
@@ -108,6 +109,7 @@ public class ProfileFragment extends Fragment {
         mTextViewRankName        = mView.findViewById(R.id.textViewRankName);
         mTextViewXP              = mView.findViewById(R.id.textViewXP);
         mTextViewXPNextRank      = mView.findViewById(R.id.textViewXPNextRank);
+        mTextViewStreak          = mView.findViewById(R.id.textViewStreak);
         mProgressBarXP           = mView.findViewById(R.id.progressBarXP);
         mTextViewLiveBadge       = mView.findViewById(R.id.textViewLiveBadge);
         mButtonWatchStream       = mView.findViewById(R.id.btnWatchStream);
@@ -230,6 +232,14 @@ public class ProfileFragment extends Fragment {
         mFollowProvider.getFollowing(uid).get().addOnSuccessListener(snap -> {
             if (snap.size() >= 10) mBadgeProvider.awardIfMissing(uid, Badge.SOCIAL);
         });
+
+        mUsersProvider.getUser(uid).addOnSuccessListener(doc -> {
+            if (!doc.exists()) return;
+            long streak = doc.getLong("currentStreak") != null ? doc.getLong("currentStreak") : 0L;
+            if (streak >= 7)   mBadgeProvider.awardIfMissing(uid, Badge.RACHA_7);
+            if (streak >= 30)  mBadgeProvider.awardIfMissing(uid, Badge.RACHA_30);
+            if (streak >= 100) mBadgeProvider.awardIfMissing(uid, Badge.RACHA_100);
+        });
     }
 
     private void loadBadges() {
@@ -270,6 +280,12 @@ public class ProfileFragment extends Fragment {
                 }
                 long xp = documentSnapshot.getLong("xp") != null ? documentSnapshot.getLong("xp") : 0L;
                 updateXPUI(xp);
+
+                long streak = documentSnapshot.getLong("currentStreak") != null
+                        ? documentSnapshot.getLong("currentStreak") : 0L;
+                if (mTextViewStreak != null) {
+                    mTextViewStreak.setText(streak > 0 ? "🔥 " + streak + " días de racha" : "🔥 Sin racha activa");
+                }
 
                 String nowPlaying = documentSnapshot.getString("nowPlaying");
                 if (nowPlaying != null && !nowPlaying.isEmpty()) {

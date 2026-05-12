@@ -8,6 +8,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.optic.socialmediagamer.models.User;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,42 @@ public class UsersProvider {
         Map<String, Object> map = new HashMap<>();
         map.put("nowPlaying", "");
         return mCollection.document(userId).set(map, SetOptions.merge());
+    }
+
+    public Query getTopWeekly(int limit) {
+        return mCollection.orderBy("weeklyXp", Query.Direction.DESCENDING).limit(limit);
+    }
+
+    public void updateStreak(String userId) {
+        mCollection.document(userId).get().addOnSuccessListener(doc -> {
+            if (!doc.exists()) return;
+            long lastMs = doc.getLong("lastActiveDateMs") != null ? doc.getLong("lastActiveDateMs") : 0L;
+            long streak = doc.getLong("currentStreak") != null ? doc.getLong("currentStreak") : 0L;
+
+            long todayStart = getMidnightToday();
+            long yesterdayStart = todayStart - 86400000L;
+
+            Map<String, Object> update = new HashMap<>();
+            if (lastMs >= todayStart) {
+                return; // ya se registró hoy, no hacer nada
+            } else if (lastMs >= yesterdayStart) {
+                streak += 1; // día consecutivo
+            } else {
+                streak = 1; // racha rota, reiniciar
+            }
+            update.put("currentStreak", streak);
+            update.put("lastActiveDateMs", new Date().getTime());
+            mCollection.document(userId).set(update, SetOptions.merge());
+        });
+    }
+
+    private long getMidnightToday() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     public Task<Void> update(User user) {

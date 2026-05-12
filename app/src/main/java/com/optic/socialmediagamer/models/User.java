@@ -12,6 +12,10 @@ public class User {
     private String imageCover;
     private String bio;
     private long xp;
+    private long weeklyXp;
+    private long weeklyXpResetAt;
+    private long currentStreak;
+    private long lastActiveDateMs;
     private String twitchUsername;
     private String nowPlaying;
     private long timestamp;
@@ -67,6 +71,18 @@ public class User {
 
     public long getXp() { return xp; }
     public void setXp(long xp) { this.xp = xp; }
+
+    public long getWeeklyXp() { return weeklyXp; }
+    public void setWeeklyXp(long weeklyXp) { this.weeklyXp = weeklyXp; }
+
+    public long getWeeklyXpResetAt() { return weeklyXpResetAt; }
+    public void setWeeklyXpResetAt(long weeklyXpResetAt) { this.weeklyXpResetAt = weeklyXpResetAt; }
+
+    public long getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(long currentStreak) { this.currentStreak = currentStreak; }
+
+    public long getLastActiveDateMs() { return lastActiveDateMs; }
+    public void setLastActiveDateMs(long lastActiveDateMs) { this.lastActiveDateMs = lastActiveDateMs; }
 
     public String getTwitchUsername() { return twitchUsername; }
     public void setTwitchUsername(String twitchUsername) { this.twitchUsername = twitchUsername; }

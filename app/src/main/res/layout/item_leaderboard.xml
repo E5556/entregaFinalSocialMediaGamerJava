@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="3dp"
+    app:cardCornerRadius="10dp"
+    app:cardBackgroundColor="@color/color_surface"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/textViewLeaderPosition"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:text="#1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageViewLeaderProfile"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/ic_person"
+            app:civ_border_color="@color/color_primary"
+            app:civ_border_width="2dp"
+            android:layout_marginStart="8dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:id="@+id/textViewLeaderUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="username"
+                android:textColor="@color/color_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewLeaderRankEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🥉"
+                android:textSize="12sp"
+                android:layout_marginTop="1dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewLeaderWeeklyXp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 XP"
+            android:textColor="@color/color_primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
