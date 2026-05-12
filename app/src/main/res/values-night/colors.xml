@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Gamer Design System -->
+    <color name="color_background">#0D0D0D</color>
+    <color name="color_surface">#1A1A1A</color>
+    <color name="color_surface_2">#242424</color>
+    <color name="color_primary">#00F0FF</color>
+    <color name="color_secondary">#BF00FF</color>
+    <color name="color_accent">#FF003C</color>
+    <color name="color_text_primary">#FFFFFF</color>
+    <color name="color_text_secondary">#8A8A8A</color>
+    <color name="color_divider">#2A2A2A</color>
+    <color name="color_icon_inactive">#444444</color>
+
+    <!-- Legacy aliases for night mode -->
+    <color name="colorPrimary">#00F0FF</color>
+    <color name="colorPrimaryDark">#0D0D0D</color>
+    <color name="colorAccent">#BF00FF</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorDarkBlue">#FFFFFF</color>
+    <color name="colorGray">#2A2A2A</color>
+    <color name="colorGrayLight">#1A1A1A</color>
+</resources>
