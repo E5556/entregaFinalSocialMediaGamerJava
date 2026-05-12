@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarCreateTournament"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:title="⚔️ Crear Torneo"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/color_surface">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JUEGO"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextTournamentGame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: Valorant, FIFA, LoL..."
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FORMATO"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <EditText
+                android:id="@+id/editTextTournamentFormat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ej: 1v1, Eliminación directa, Round Robin..."
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FECHA DEL TORNEO"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/textViewTournamentDatePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Toca para elegir fecha"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_secondary"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MÁX. JUGADORES"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <Spinner
+                android:id="@+id/spinnerMaxPlayers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/color_surface_2"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp" />
+
+            <Button
+                android:id="@+id/buttonCreateTournament"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚔️ CREAR TORNEO"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:backgroundTint="@color/color_primary"
+                android:textColor="@color/color_background" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

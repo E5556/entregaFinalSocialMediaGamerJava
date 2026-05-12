@@ -5,8 +5,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 import com.optic.socialmediagamer.providers.MissionsProvider;
+import com.optic.socialmediagamer.providers.ReputationProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
@@ -49,6 +52,7 @@ public class UserProfileActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     NotificationsProvider mNotificationsProvider;
     XPProvider mXPProvider;
+    ReputationProvider mReputationProvider;
     PostsAdapter mPostsAdapter;
 
     String mIdUser;
@@ -77,6 +81,7 @@ public class UserProfileActivity extends AppCompatActivity {
         mAuthProvider          = new AuthProvider();
         mNotificationsProvider = new NotificationsProvider();
         mXPProvider = new XPProvider();
+        mReputationProvider = new ReputationProvider();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mCircleImageBack.setOnClickListener(v -> finish());
@@ -86,6 +91,7 @@ public class UserProfileActivity extends AppCompatActivity {
         loadPostCount();
         loadFollowersCount();
         checkIfFollowing();
+        loadReputation();
     }
 
     private void loadUserData() {
@@ -114,6 +120,39 @@ public class UserProfileActivity extends AppCompatActivity {
         mFollowProvider.getFollowers(mIdUser).get().addOnSuccessListener(snap -> {
             mTextViewFollowersCount.setText(String.valueOf(snap.size()));
         });
+    }
+
+    private void loadReputation() {
+        mReputationProvider.getByUser(mIdUser).addOnSuccessListener(snap -> {
+            if (snap.isEmpty()) return;
+
+            float total = 0f;
+            for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                com.optic.socialmediagamer.models.GameRating r =
+                        doc.toObject(com.optic.socialmediagamer.models.GameRating.class);
+                if (r != null) total += (r.getCommunication() + r.getSkill() + r.getAttitude()) / 3f;
+            }
+            float avg = total / snap.size();
+
+            LinearLayout section = findViewById(R.id.layoutReputationSection);
+            View divider = findViewById(R.id.dividerReputation);
+            TextView tvValue = findViewById(R.id.textViewGamerScoreValue);
+            TextView tvStars = findViewById(R.id.textViewGamerScoreStars);
+            TextView tvCount = findViewById(R.id.textViewGamerScoreCount);
+
+            section.setVisibility(View.VISIBLE);
+            divider.setVisibility(View.VISIBLE);
+            tvValue.setText(String.format(java.util.Locale.getDefault(), "%.1f", avg));
+            tvStars.setText(buildStars(avg));
+            tvCount.setText(snap.size() + " valoraciones");
+        });
+    }
+
+    private String buildStars(float avg) {
+        StringBuilder sb = new StringBuilder();
+        int full = (int) avg;
+        for (int i = 0; i < 5; i++) sb.append(i < full ? "★" : "☆");
+        return sb.toString();
     }
 
     private void checkIfFollowing() {

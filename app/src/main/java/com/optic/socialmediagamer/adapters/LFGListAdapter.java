@@ -21,7 +21,9 @@ import com.optic.socialmediagamer.models.LFGPost;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.LFGProvider;
 import com.optic.socialmediagamer.providers.MissionsProvider;
+import com.optic.socialmediagamer.providers.ReputationProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.models.GameRating;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
     private final LFGProvider mLFGProvider;
     private final AuthProvider mAuthProvider;
     private final UsersProvider mUsersProvider;
+    private final ReputationProvider mReputationProvider;
 
     public LFGListAdapter(List<LFGPost> items, Context context) {
         this.items = items;
@@ -40,6 +43,7 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
         mLFGProvider = new LFGProvider();
         mAuthProvider = new AuthProvider();
         mUsersProvider = new UsersProvider();
+        mReputationProvider = new ReputationProvider();
     }
 
     @Override
@@ -94,8 +98,10 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
 
         holder.buttonJoin.setOnClickListener(v -> {
             if (hasJoined) {
-                mLFGProvider.leaveParty(lfgId, myId).addOnSuccessListener(u ->
-                        Toast.makeText(context, "Saliste de la party", Toast.LENGTH_SHORT).show());
+                mLFGProvider.leaveParty(lfgId, myId).addOnSuccessListener(u -> {
+                    Toast.makeText(context, "Saliste de la party", Toast.LENGTH_SHORT).show();
+                    showRatingDialog(lfg.getIdUser(), lfg.getGame(), myId);
+                });
             } else if (!isFull) {
                 mLFGProvider.joinParty(lfgId, myId).addOnSuccessListener(u -> {
                     Toast.makeText(context, "¡Entraste a la party! 🎮", Toast.LENGTH_SHORT).show();
@@ -134,6 +140,38 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
                 target.setVisibility(View.VISIBLE);
                 target.setText("🎮 " + String.join("  ·  ", names));
             }
+        });
+    }
+
+    private void showRatingDialog(String creatorId, String game, String myId) {
+        if (creatorId == null || creatorId.equals(myId)) return;
+
+        mReputationProvider.hasRated(myId, creatorId, game).addOnSuccessListener(snap -> {
+            if (!snap.isEmpty()) return; // ya calificó
+
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setTitle("⭐ Califica tu experiencia en la party de " + game);
+
+            android.view.View dialogView = android.view.LayoutInflater.from(context)
+                    .inflate(android.R.layout.simple_list_item_1, null);
+
+            // Use a simple array of labels for rating dialog
+            String[] options = {"⭐ Mala (1)", "⭐⭐ Regular (2)", "⭐⭐⭐ Buena (3)", "⭐⭐⭐⭐ Muy buena (4)", "⭐⭐⭐⭐⭐ Excelente (5)"};
+            builder.setItems(options, (d, which) -> {
+                float score = which + 1f;
+                GameRating rating = new GameRating();
+                rating.setIdFrom(myId);
+                rating.setIdTo(creatorId);
+                rating.setGame(game);
+                rating.setCommunication(score);
+                rating.setSkill(score);
+                rating.setAttitude(score);
+                rating.setTimestamp(System.currentTimeMillis());
+                mReputationProvider.save(rating).addOnSuccessListener(u ->
+                        Toast.makeText(context, "¡Gracias por tu valoración! ⭐", Toast.LENGTH_SHORT).show());
+            });
+            builder.setNegativeButton("Omitir", null);
+            builder.show();
         });
     }
 

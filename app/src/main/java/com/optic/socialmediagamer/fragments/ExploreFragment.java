@@ -38,6 +38,7 @@ public class ExploreFragment extends Fragment {
         mTabLayout.addTab(mTabLayout.newTab().setText("🏆 Eventos"));
         mTabLayout.addTab(mTabLayout.newTab().setText("🌐 Comunidades"));
         mTabLayout.addTab(mTabLayout.newTab().setText("🏅 Ranking"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("⚔️ Torneos"));
 
         loadFragment(new FiltersFragment());
 
@@ -51,6 +52,7 @@ public class ExploreFragment extends Fragment {
                     case 3: fragment = new EventsFragment(); break;
                     case 4: fragment = new CommunitiesFragment(); break;
                     case 5: fragment = new LeaderboardFragment(); break;
+                    case 6: fragment = new TournamentsFragment(); break;
                     default: fragment = new FiltersFragment(); break;
                 }
                 loadFragment(fragment);
