@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -29,6 +30,8 @@ import com.optic.socialmediagamer.providers.CommentsProvider;
 import com.optic.socialmediagamer.providers.LikesProvider;
 import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
+import com.optic.socialmediagamer.models.Poll;
+import com.optic.socialmediagamer.providers.PollProvider;
 import com.optic.socialmediagamer.providers.ReactionsProvider;
 import com.optic.socialmediagamer.providers.TwitchProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
@@ -54,8 +57,10 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
     ReactionsProvider mReactionsProvider;
     PostProvider mPostProvider;
     XPProvider mXPProvider;
+    PollProvider mPollProvider;
 
     private final Map<String, ListenerRegistration> mReactionListeners = new HashMap<>();
+    private final Map<String, ListenerRegistration> mPollListeners = new HashMap<>();
 
     public PostsAdapter(FirestoreRecyclerOptions<Post> options, Context context) {
         super(options);
@@ -68,6 +73,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         mReactionsProvider     = new ReactionsProvider();
         mPostProvider          = new PostProvider();
         mXPProvider            = new XPProvider();
+        mPollProvider          = new PollProvider();
     }
 
     @Override
@@ -109,6 +115,14 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
 
         mCommentsProvider.getCommentsByPost(idPost).get().addOnSuccessListener(snap ->
             holder.textViewCommentCount.setText(String.valueOf(snap.size())));
+
+        // Poll en tiempo real
+        if (post.isHasPoll()) {
+            holder.layoutPollCard.setVisibility(View.VISIBLE);
+            bindPoll(idPost, holder);
+        } else {
+            holder.layoutPollCard.setVisibility(View.GONE);
+        }
 
         // Reacciones en tiempo real
         bindReactions(idPost, holder);
@@ -182,6 +196,69 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             intent.putExtra("category", post.getCategory());
             context.startActivity(intent);
         });
+    }
+
+    private void bindPoll(String idPost, ViewHolder holder) {
+        ListenerRegistration prev = mPollListeners.get(idPost);
+        if (prev != null) prev.remove();
+
+        ListenerRegistration reg = mPollProvider.listen(idPost, (snap, e) -> {
+            if (snap == null || !snap.exists()) return;
+            Poll poll = snap.toObject(Poll.class);
+            if (poll == null) return;
+
+            String myId = mAuthProvider.getUid();
+            java.util.List<String> votesA = poll.getVotesA();
+            java.util.List<String> votesB = poll.getVotesB();
+            int countA = votesA.size();
+            int countB = votesB.size();
+            int total  = countA + countB;
+
+            holder.textViewPollOptionA.setText(poll.getOptionA());
+            holder.textViewPollOptionB.setText(poll.getOptionB());
+            holder.textViewPollTotalVotes.setText(total + " votos");
+
+            if (total > 0) {
+                int pctA = (int) (countA * 100f / total);
+                int pctB = 100 - pctA;
+                holder.progressBarA.setProgress(pctA);
+                holder.progressBarB.setProgress(pctB);
+                holder.textViewPollPercentA.setText(pctA + "% (" + countA + ")");
+                holder.textViewPollPercentB.setText(pctB + "% (" + countB + ")");
+            } else {
+                holder.progressBarA.setProgress(50);
+                holder.progressBarB.setProgress(50);
+                holder.textViewPollPercentA.setText("0%");
+                holder.textViewPollPercentB.setText("0%");
+            }
+
+            boolean votedA = myId != null && votesA.contains(myId);
+            boolean votedB = myId != null && votesB.contains(myId);
+
+            holder.btnVoteA.setAlpha(votedA ? 1f : 0.5f);
+            holder.btnVoteB.setAlpha(votedB ? 1f : 0.5f);
+
+            holder.btnVoteA.setOnClickListener(v -> {
+                if (myId == null) return;
+                if (votedA) {
+                    mPollProvider.removeVoteA(idPost, myId);
+                } else {
+                    if (votedB) mPollProvider.removeVoteB(idPost, myId);
+                    mPollProvider.voteA(idPost, myId);
+                }
+            });
+            holder.btnVoteB.setOnClickListener(v -> {
+                if (myId == null) return;
+                if (votedB) {
+                    mPollProvider.removeVoteB(idPost, myId);
+                } else {
+                    if (votedA) mPollProvider.removeVoteA(idPost, myId);
+                    mPollProvider.voteB(idPost, myId);
+                }
+            });
+        });
+
+        mPollListeners.put(idPost, reg);
     }
 
     private void bindReactions(String idPost, ViewHolder holder) {
@@ -278,6 +355,8 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         if (holder.boundPostId != null) {
             ListenerRegistration reg = mReactionListeners.remove(holder.boundPostId);
             if (reg != null) reg.remove();
+            ListenerRegistration pollReg = mPollListeners.remove(holder.boundPostId);
+            if (pollReg != null) pollReg.remove();
             holder.boundPostId = null;
         }
     }
@@ -302,6 +381,16 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         TextView textViewLiveDot;
         TextView textViewAddReaction;
         TextView textViewReactionsSummary;
+        LinearLayout layoutPollCard;
+        TextView textViewPollOptionA;
+        TextView textViewPollOptionB;
+        ProgressBar progressBarA;
+        ProgressBar progressBarB;
+        TextView textViewPollPercentA;
+        TextView textViewPollPercentB;
+        TextView btnVoteA;
+        TextView btnVoteB;
+        TextView textViewPollTotalVotes;
         String boundPostId;
 
         public ViewHolder(View view) {
@@ -316,8 +405,18 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             textViewAuthorUsername  = view.findViewById(R.id.textViewAuthorUsername);
             textViewAuthorRank      = view.findViewById(R.id.textViewAuthorRank);
             textViewLiveDot         = view.findViewById(R.id.textViewLiveDot);
-            textViewAddReaction     = view.findViewById(R.id.textViewAddReaction);
+            textViewAddReaction      = view.findViewById(R.id.textViewAddReaction);
             textViewReactionsSummary = view.findViewById(R.id.textViewReactionsSummary);
+            layoutPollCard           = view.findViewById(R.id.layoutPollCard);
+            textViewPollOptionA      = view.findViewById(R.id.textViewPollOptionA);
+            textViewPollOptionB      = view.findViewById(R.id.textViewPollOptionB);
+            progressBarA             = view.findViewById(R.id.progressBarA);
+            progressBarB             = view.findViewById(R.id.progressBarB);
+            textViewPollPercentA     = view.findViewById(R.id.textViewPollPercentA);
+            textViewPollPercentB     = view.findViewById(R.id.textViewPollPercentB);
+            btnVoteA                 = view.findViewById(R.id.btnVoteA);
+            btnVoteB                 = view.findViewById(R.id.btnVoteB);
+            textViewPollTotalVotes   = view.findViewById(R.id.textViewPollTotalVotes);
         }
     }
 }

@@ -10,6 +10,8 @@ public class Post {
     private String idUser;
     private String category;
     private long timestamp;
+    private long likeCount;
+    private boolean hasPoll;
 
     public Post() {
 
@@ -89,4 +91,10 @@ public class Post {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+
+    public long getLikeCount() { return likeCount; }
+    public void setLikeCount(long likeCount) { this.likeCount = likeCount; }
+
+    public boolean isHasPoll() { return hasPoll; }
+    public void setHasPoll(boolean hasPoll) { this.hasPoll = hasPoll; }
 }
