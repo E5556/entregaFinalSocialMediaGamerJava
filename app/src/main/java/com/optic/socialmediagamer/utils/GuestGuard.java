@@ -24,23 +24,19 @@ public class GuestGuard {
     public static boolean check(Context context) {
         if (!new AuthProvider().isGuest()) return false;
 
-        String[] options = {"Crear cuenta", "Iniciar con Google", "Ahora no"};
-
         new AlertDialog.Builder(context)
                 .setTitle("Acción no disponible")
-                .setMessage("Los invitados solo pueden explorar.\n\nInicia sesión para comentar, publicar, unirte a clanes y mucho más.")
-                .setItems(options, (d, which) -> {
-                    if (which == 0) {
-                        context.startActivity(new Intent(context, RegisterActivity.class));
-                    } else if (which == 1) {
-                        // Sign out anonymous session and go to MainActivity for Google login
-                        new AuthProvider().logout();
-                        Intent intent = new Intent(context, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("autoGoogle", true);
-                        context.startActivity(intent);
-                    }
+                .setMessage("Los invitados solo pueden explorar.\nInicia sesión para continuar.")
+                .setPositiveButton("CREAR CUENTA", (d, w) ->
+                        context.startActivity(new Intent(context, RegisterActivity.class)))
+                .setNeutralButton("GOOGLE", (d, w) -> {
+                    new AuthProvider().logout();
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("autoGoogle", true);
+                    context.startActivity(intent);
                 })
+                .setNegativeButton("Ahora no", null)
                 .show();
 
         return true;
