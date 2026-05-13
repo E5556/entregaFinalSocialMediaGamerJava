@@ -33,4 +33,8 @@ public class Clan {
     public void setMembers(List<String> members) { this.members = members; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+    private long clanXp;
+    public long getClanXp() { return clanXp; }
+    public void setClanXp(long clanXp) { this.clanXp = clanXp; }
 }

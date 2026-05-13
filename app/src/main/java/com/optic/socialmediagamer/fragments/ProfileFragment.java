@@ -36,6 +36,7 @@ import com.optic.socialmediagamer.activities.EditProfileActivity;
 import com.optic.socialmediagamer.activities.MyCollectionsActivity;
 import com.optic.socialmediagamer.activities.ClansActivity;
 import com.optic.socialmediagamer.activities.GamerCardActivity;
+import com.optic.socialmediagamer.activities.WeeklyChallengeActivity;
 import com.optic.socialmediagamer.activities.MyChallengesActivity;
 import com.optic.socialmediagamer.activities.WeeklyMissionsActivity;
 import com.optic.socialmediagamer.providers.AuthProvider;
@@ -160,6 +161,9 @@ public class ProfileFragment extends Fragment {
 
         mView.findViewById(R.id.layoutClans).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), ClansActivity.class)));
+
+        mView.findViewById(R.id.layoutWeeklyChallenge).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), WeeklyChallengeActivity.class)));
 
         mView.findViewById(R.id.layoutMyChallenges).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), MyChallengesActivity.class)));

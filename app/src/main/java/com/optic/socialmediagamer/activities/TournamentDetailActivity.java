@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.models.Tournament;
 import com.optic.socialmediagamer.providers.AuthProvider;
+import com.optic.socialmediagamer.providers.ClanProvider;
 import com.optic.socialmediagamer.providers.TournamentProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 
@@ -39,6 +40,7 @@ public class TournamentDetailActivity extends AppCompatActivity {
     private final AuthProvider mAuthProvider = new AuthProvider();
     private final TournamentProvider mTournamentProvider = new TournamentProvider();
     private final UsersProvider mUsersProvider = new UsersProvider();
+    private final ClanProvider mClanProvider = new ClanProvider();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,6 +252,7 @@ public class TournamentDetailActivity extends AppCompatActivity {
                         mTournamentProvider.setWinner(mTournamentId, winnerUid, winnerName)
                                 .addOnSuccessListener(u -> {
                                     Toast.makeText(this, "🏆 ¡" + usernames[which] + " ganó el torneo!", Toast.LENGTH_LONG).show();
+                                    mClanProvider.awardClanXPForUser(winnerUid, 50);
                                     loadTournament();
                                 });
                     }).show();

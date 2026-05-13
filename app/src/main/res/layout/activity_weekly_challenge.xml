@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarWeeklyChallenge"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:title="🎯 Reto de la Semana"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Challenge header card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_surface"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/textViewChallengeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:text="🎯 Cargando..." />
+
+                <TextView
+                    android:id="@+id/textViewChallengeDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginTop="6dp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/textViewChallengeStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/textViewChallengeWinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_primary"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:text="" />
+
+                <Button
+                    android:id="@+id/buttonSubmitEntry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🎯 ENVIAR MI PARTICIPACIÓN"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:backgroundTint="@color/color_primary"
+                    android:textColor="@color/color_background"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Admin create (hidden for non-admins) -->
+            <LinearLayout
+                android:id="@+id/layoutAdminCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/buttonCreateWeeklyChallenge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️ PUBLICAR RETO DE LA SEMANA"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:backgroundTint="@color/color_surface_2"
+                    android:textColor="@color/color_text_primary" />
+
+            </LinearLayout>
+
+            <!-- Entries -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PARTICIPACIONES"
+                android:textColor="@color/color_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutChallengeEntries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

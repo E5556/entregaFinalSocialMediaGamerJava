@@ -12,6 +12,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.optic.socialmediagamer.models.Clan;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClanProvider {
@@ -60,5 +61,26 @@ public class ClanProvider {
 
     public Task<Void> delete(String clanId) {
         return mCollection.document(clanId).delete();
+    }
+
+    public Task<Void> addClanXP(String clanId, long amount) {
+        Map<String, Object> update = new HashMap<>();
+        update.put("clanXp", FieldValue.increment(amount));
+        return mCollection.document(clanId).set(update, SetOptions.merge());
+    }
+
+    public Query getRanking() {
+        return mCollection.orderBy("clanXp", Query.Direction.DESCENDING).limit(20);
+    }
+
+    /** Awards clanXp to the clan of a given user, if they belong to one. */
+    public void awardClanXPForUser(String userId, long amount) {
+        getByMember(userId).addOnSuccessListener(snap -> {
+            List<com.google.firebase.firestore.DocumentSnapshot> docs = snap.getDocuments();
+            if (!docs.isEmpty()) {
+                String clanId = docs.get(0).getId();
+                addClanXP(clanId, amount);
+            }
+        });
     }
 }

@@ -16,6 +16,7 @@ import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.models.Challenge;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.ChallengesProvider;
+import com.optic.socialmediagamer.providers.ClanProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 
@@ -38,6 +39,7 @@ public class ChallengeDetailActivity extends AppCompatActivity {
     private final ChallengesProvider mChallengesProvider = new ChallengesProvider();
     private final UsersProvider mUsersProvider = new UsersProvider();
     private final XPProvider mXPProvider = new XPProvider();
+    private final ClanProvider mClanProvider = new ClanProvider();
 
     private String mMyId;
     private String mChallengerUsername = "?";
@@ -204,6 +206,7 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         }
         mChallengesProvider.finish(mChallengeId, winnerUid, winnerUsername).addOnSuccessListener(u -> {
             mXPProvider.addXP(winnerUid, 30);
+            mClanProvider.awardClanXPForUser(winnerUid, 30);
             Toast.makeText(this, "🏆 ¡@" + winnerUsername + " ganó el desafío! +30 XP", Toast.LENGTH_LONG).show();
             loadChallenge();
         });

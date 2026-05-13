@@ -40,6 +40,7 @@ public class ExploreFragment extends Fragment {
         mTabLayout.addTab(mTabLayout.newTab().setText("🏅 Ranking"));
         mTabLayout.addTab(mTabLayout.newTab().setText("⚔️ Torneos"));
         mTabLayout.addTab(mTabLayout.newTab().setText("🎮 Jugando"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("🛡️ Clanes"));
 
         loadFragment(new FiltersFragment());
 
@@ -55,6 +56,7 @@ public class ExploreFragment extends Fragment {
                     case 5: fragment = new LeaderboardFragment(); break;
                     case 6: fragment = new TournamentsFragment(); break;
                     case 7: fragment = new NowPlayingFragment(); break;
+                    case 8: fragment = new ClanRankingFragment(); break;
                     default: fragment = new FiltersFragment(); break;
                 }
                 loadFragment(fragment);
