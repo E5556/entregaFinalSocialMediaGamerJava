@@ -223,7 +223,9 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             goHome();
                         } else {
-                            Toast.makeText(this, "No se pudo iniciar sesión como invitado", Toast.LENGTH_SHORT).show();
+                            String err = task.getException() != null ? task.getException().getMessage() : "desconocido";
+                            Log.e("GUEST_LOGIN", "Error: " + err);
+                            Toast.makeText(this, "Error: " + err, Toast.LENGTH_LONG).show();
                         }
                     });
                 })
