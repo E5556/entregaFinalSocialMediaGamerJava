@@ -50,6 +50,7 @@
         <activity android:name=".activities.CompleteProfileActivity" />
         <activity
             android:name=".activities.HomeActivity"
+            android:configChanges="uiMode"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.PhoneLoginActivity" />

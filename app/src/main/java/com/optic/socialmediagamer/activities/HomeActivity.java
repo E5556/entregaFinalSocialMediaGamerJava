@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -34,6 +35,13 @@ public class HomeActivity extends AppCompatActivity {
     ProfileFragment      mProfileFragment;
     Fragment             mActiveFragment;
 
+    private static final String KEY_SELECTED_TAB = "selected_tab";
+    private static final String TAG_HOME          = "tag_home";
+    private static final String TAG_EXPLORE       = "tag_explore";
+    private static final String TAG_CHATS         = "tag_chats";
+    private static final String TAG_NOTIFICATIONS = "tag_notifications";
+    private static final String TAG_PROFILE       = "tag_profile";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,30 +50,74 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnItemSelectedListener(navigationItemSelectedListener);
 
-        initFragments();
+        int selectedTab = savedInstanceState != null
+                ? savedInstanceState.getInt(KEY_SELECTED_TAB, R.id.itemHome)
+                : R.id.itemHome;
+
+        initFragments(savedInstanceState, selectedTab);
 
         mNotificationsProvider = new NotificationsProvider();
         mAuthProvider = new AuthProvider();
         listenUnreadBadge();
-        checkProfileComplete();
-        new UsersProvider().updateStreak(mAuthProvider.getUid());
+        if (savedInstanceState == null) {
+            checkProfileComplete();
+            new UsersProvider().updateStreak(mAuthProvider.getUid());
+        }
     }
 
-    private void initFragments() {
-        mHomeFragment          = new HomeFragment();
-        mExploreFragment       = new ExploreFragment();
-        mChatsFragment         = new ChatsFragment();
-        mNotificationsFragment = new NotificationsFragment();
-        mProfileFragment       = new ProfileFragment();
-        mActiveFragment        = mHomeFragment;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
+    }
 
-        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-        t.add(R.id.container, mProfileFragment).hide(mProfileFragment);
-        t.add(R.id.container, mNotificationsFragment).hide(mNotificationsFragment);
-        t.add(R.id.container, mChatsFragment).hide(mChatsFragment);
-        t.add(R.id.container, mExploreFragment).hide(mExploreFragment);
-        t.add(R.id.container, mHomeFragment);
+    private void initFragments(Bundle savedInstanceState, int selectedTabId) {
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+
+        if (savedInstanceState != null) {
+            // Fragments already restored by FragmentManager — just retrieve them by tag
+            mHomeFragment          = (HomeFragment)          fm.findFragmentByTag(TAG_HOME);
+            mExploreFragment       = (ExploreFragment)       fm.findFragmentByTag(TAG_EXPLORE);
+            mChatsFragment         = (ChatsFragment)         fm.findFragmentByTag(TAG_CHATS);
+            mNotificationsFragment = (NotificationsFragment) fm.findFragmentByTag(TAG_NOTIFICATIONS);
+            mProfileFragment       = (ProfileFragment)       fm.findFragmentByTag(TAG_PROFILE);
+        }
+
+        // Fallback: create any fragment that wasn't found (first launch or missing tag)
+        if (mHomeFragment          == null) mHomeFragment          = new HomeFragment();
+        if (mExploreFragment       == null) mExploreFragment       = new ExploreFragment();
+        if (mChatsFragment         == null) mChatsFragment         = new ChatsFragment();
+        if (mNotificationsFragment == null) mNotificationsFragment = new NotificationsFragment();
+        if (mProfileFragment       == null) mProfileFragment       = new ProfileFragment();
+
+        mActiveFragment = fragmentForId(selectedTabId);
+
+        FragmentTransaction t = fm.beginTransaction();
+        addIfNeeded(t, mProfileFragment,       TAG_PROFILE);
+        addIfNeeded(t, mNotificationsFragment, TAG_NOTIFICATIONS);
+        addIfNeeded(t, mChatsFragment,         TAG_CHATS);
+        addIfNeeded(t, mExploreFragment,       TAG_EXPLORE);
+        addIfNeeded(t, mHomeFragment,          TAG_HOME);
+
+        // Hide all, then show the selected one
+        t.hide(mHomeFragment).hide(mExploreFragment).hide(mChatsFragment)
+         .hide(mNotificationsFragment).hide(mProfileFragment)
+         .show(mActiveFragment);
         t.commit();
+
+        bottomNavigation.setSelectedItemId(selectedTabId);
+    }
+
+    private void addIfNeeded(FragmentTransaction t, Fragment f, String tag) {
+        if (!f.isAdded()) t.add(R.id.container, f, tag);
+    }
+
+    private Fragment fragmentForId(int id) {
+        if (id == R.id.itemExplore)       return mExploreFragment;
+        if (id == R.id.itemChats)         return mChatsFragment;
+        if (id == R.id.itemNotifications) return mNotificationsFragment;
+        if (id == R.id.itemProfile)       return mProfileFragment;
+        return mHomeFragment;
     }
 
     private void showFragment(Fragment target) {
@@ -104,6 +156,12 @@ public class HomeActivity extends AppCompatActivity {
                         bottomNavigation.removeBadge(R.id.itemNotifications);
                     }
                 });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 
     @Override

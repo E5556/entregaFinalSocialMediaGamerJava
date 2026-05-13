@@ -1,5 +1,7 @@
 package com.optic.socialmediagamer.models;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Badge {
 
     public static final String PRIMER_POST = "PRIMER_POST";
@@ -40,6 +42,7 @@ public class Badge {
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
+    @Exclude
     public String getEmoji() {
         switch (badgeKey != null ? badgeKey : "") {
             case PRIMER_POST:   return "🎮";
@@ -58,6 +61,7 @@ public class Badge {
         }
     }
 
+    @Exclude
     public String getTitle() {
         switch (badgeKey != null ? badgeKey : "") {
             case PRIMER_POST:   return "Primer Post";
