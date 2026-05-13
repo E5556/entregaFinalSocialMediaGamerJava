@@ -70,6 +70,18 @@
                     android:layout_marginTop="6dp"
                     android:text="0 miembros" />
 
+                <TextView
+                    android:id="@+id/textViewDissolvedBanner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B00020"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:text="⛔ CLAN DISUELTO" />
+
             </LinearLayout>
 
             <!-- Edit description (leader only) -->
@@ -154,6 +166,30 @@
                     android:layout_marginStart="8dp" />
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonTransferLeadership"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👑 TRANSFERIR LIDERAZGO"
+                android:fontFamily="monospace"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:backgroundTint="@color/color_surface_2"
+                android:textColor="@color/color_text_primary"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Pending join requests (leader only) -->
+            <LinearLayout
+                android:id="@+id/layoutPending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone" />
 
             <!-- Members section -->
             <TextView

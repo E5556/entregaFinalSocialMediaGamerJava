@@ -26,6 +26,7 @@ public class ClanProvider {
     public Task<Void> create(Clan clan) {
         DocumentReference ref = mCollection.document();
         clan.setId(ref.getId());
+        clan.setActive(true);
         return ref.set(clan);
     }
 
@@ -34,11 +35,32 @@ public class ClanProvider {
     }
 
     public Task<QuerySnapshot> getByMember(String userId) {
-        return mCollection.whereArrayContains("members", userId).get();
+        return mCollection.whereArrayContains("members", userId)
+                .whereEqualTo("active", true).get();
     }
 
     public Query getAll() {
+        // filter active client-side to avoid composite index requirement
         return mCollection.orderBy("timestamp", Query.Direction.DESCENDING);
+    }
+
+    public Query getArchived() {
+        return mCollection.orderBy("dissolvedAt", Query.Direction.DESCENDING);
+    }
+
+    public Task<Void> requestJoin(String clanId, String userId) {
+        return mCollection.document(clanId).update("pendingMembers", FieldValue.arrayUnion(userId));
+    }
+
+    public Task<Void> approveJoin(String clanId, String userId) {
+        Map<String, Object> update = new HashMap<>();
+        update.put("members", FieldValue.arrayUnion(userId));
+        update.put("pendingMembers", FieldValue.arrayRemove(userId));
+        return mCollection.document(clanId).set(update, SetOptions.merge());
+    }
+
+    public Task<Void> rejectJoin(String clanId, String userId) {
+        return mCollection.document(clanId).update("pendingMembers", FieldValue.arrayRemove(userId));
     }
 
     public Task<Void> join(String clanId, String userId) {
@@ -46,17 +68,34 @@ public class ClanProvider {
     }
 
     public Task<Void> leave(String clanId, String userId) {
-        return mCollection.document(clanId).update("members", FieldValue.arrayRemove(userId));
+        Map<String, Object> update = new HashMap<>();
+        update.put("members", FieldValue.arrayRemove(userId));
+        update.put("officers", FieldValue.arrayRemove(userId));
+        return mCollection.document(clanId).set(update, SetOptions.merge());
     }
 
     public Task<Void> kick(String clanId, String userId) {
-        return mCollection.document(clanId).update("members", FieldValue.arrayRemove(userId));
+        Map<String, Object> update = new HashMap<>();
+        update.put("members", FieldValue.arrayRemove(userId));
+        update.put("officers", FieldValue.arrayRemove(userId));
+        return mCollection.document(clanId).set(update, SetOptions.merge());
     }
 
     public Task<Void> updateInfo(String clanId, String description) {
         Map<String, Object> update = new HashMap<>();
         update.put("description", description);
         return mCollection.document(clanId).set(update, SetOptions.merge());
+    }
+
+    public Task<Void> dissolve(String clanId) {
+        Map<String, Object> update = new HashMap<>();
+        update.put("active", false);
+        update.put("dissolvedAt", System.currentTimeMillis());
+        return mCollection.document(clanId).set(update, SetOptions.merge());
+    }
+
+    public Task<Void> transferLeadership(String clanId, String newLeaderId) {
+        return mCollection.document(clanId).update("idLeader", newLeaderId);
     }
 
     public Task<Void> delete(String clanId) {

@@ -45,7 +45,6 @@ public class ClansActivity extends AppCompatActivity {
         mAuthProvider = new AuthProvider();
 
         mFab.setOnClickListener(v -> startActivity(new Intent(this, CreateClanActivity.class)));
-        loadClans();
     }
 
     @Override
@@ -58,21 +57,40 @@ public class ClansActivity extends AppCompatActivity {
         mLayoutClans.removeAllViews();
         mClanProvider.getAll().get().addOnSuccessListener(snap -> {
             List<DocumentSnapshot> docs = snap.getDocuments();
-            if (docs.isEmpty()) {
-                mTextViewEmpty.setVisibility(View.VISIBLE);
-                return;
-            }
-            mTextViewEmpty.setVisibility(View.GONE);
+            boolean hasActive = false;
+            List<Clan> dissolved = new java.util.ArrayList<>();
+
             for (DocumentSnapshot doc : docs) {
                 Clan clan = doc.toObject(Clan.class);
                 if (clan == null) continue;
-                addClanRow(clan);
+                clan.setId(doc.getId());
+                if (clan.isActive()) {
+                    hasActive = true;
+                    addClanRow(clan, false);
+                } else {
+                    dissolved.add(clan);
+                }
+            }
+
+            mTextViewEmpty.setVisibility(hasActive ? View.GONE : View.VISIBLE);
+
+            if (!dissolved.isEmpty()) {
+                TextView header = new TextView(this);
+                header.setText("⛔ CLANES DISUELTOS");
+                header.setTextColor(getColor(R.color.color_text_secondary));
+                header.setTextSize(11);
+                header.setTypeface(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD);
+                header.setPadding(16, 24, 16, 8);
+                mLayoutClans.addView(header);
+                for (Clan clan : dissolved) {
+                    addClanRow(clan, true);
+                }
             }
         }).addOnFailureListener(e ->
                 Toast.makeText(this, "Error cargando clanes", Toast.LENGTH_SHORT).show());
     }
 
-    private void addClanRow(Clan clan) {
+    private void addClanRow(Clan clan, boolean dissolved) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(16, 16, 16, 16);
@@ -81,8 +99,9 @@ public class ClansActivity extends AppCompatActivity {
         row.setFocusable(true);
 
         TextView tvName = new TextView(this);
-        tvName.setText("🛡️ " + clan.getName() + "  [" + clan.getTag() + "]");
-        tvName.setTextColor(getColor(R.color.color_text_primary));
+        String icon = dissolved ? "⛔ " : "🛡️ ";
+        tvName.setText(icon + clan.getName() + "  [" + clan.getTag() + "]");
+        tvName.setTextColor(getColor(dissolved ? R.color.color_text_secondary : R.color.color_text_primary));
         tvName.setTextSize(15);
         tvName.setTypeface(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD);
         row.addView(tvName);

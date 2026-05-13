@@ -43,4 +43,16 @@ public class Clan {
     private long clanXp;
     public long getClanXp() { return clanXp; }
     public void setClanXp(long clanXp) { this.clanXp = clanXp; }
+
+    private boolean active = true;
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    private long dissolvedAt;
+    public long getDissolvedAt() { return dissolvedAt; }
+    public void setDissolvedAt(long dissolvedAt) { this.dissolvedAt = dissolvedAt; }
+
+    private List<String> pendingMembers;
+    public List<String> getPendingMembers() { return pendingMembers; }
+    public void setPendingMembers(List<String> pendingMembers) { this.pendingMembers = pendingMembers; }
 }
