@@ -85,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
         mButtonGoogle.setOnClickListener(v -> signInGoogle());
         mButtonPhone.setOnClickListener(v -> signInWithPhone());
         mButtonGuest.setOnClickListener(v -> signInAsGuest());
+
+        if (getIntent().getBooleanExtra("autoGoogle", false)) {
+            signInGoogle();
+        }
         mTextViewRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
         mTextViewForgotPassword.setOnClickListener(v -> showForgotPasswordDialog());
