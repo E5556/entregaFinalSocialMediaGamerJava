@@ -153,7 +153,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             });
 
             holder.imageViewLike.setOnClickListener(v -> {
-                if (com.optic.socialmediagamer.utils.GuestGuard.check(mContext)) return;
+                if (com.optic.socialmediagamer.utils.GuestGuard.check(context)) return;
                 mLikesProvider.getLike(myId, idPost).get().addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         mLikesProvider.unlike(myId, idPost).addOnSuccessListener(u -> {
