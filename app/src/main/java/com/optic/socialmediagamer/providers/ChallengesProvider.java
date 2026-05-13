@@ -89,4 +89,8 @@ public class ChallengesProvider {
         update.put("winnerUsername", winnerUsername);
         return mCollection.document(challengeId).update(update);
     }
+
+    public Task<Void> finishNoWinner(String challengeId) {
+        return mCollection.document(challengeId).update("status", "finished");
+    }
 }

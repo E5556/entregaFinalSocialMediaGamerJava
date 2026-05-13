@@ -41,7 +41,7 @@ public class ChallengeDetailActivity extends AppCompatActivity {
     private TextView mTextPlayers, mTextStatus, mTextDescription, mTextWinner;
     private TextView mTextEvidenceChallenger, mTextEvidenceChallenged;
     private EditText mEditEvidence;
-    private ImageView mImageEvidencePreview;
+    private ImageView mImageEvidencePreview, mImageEvidenceChallengerImg, mImageEvidenceChallengedImg;
     private LinearLayout mLayoutAcceptReject, mLayoutEvidenceButtons;
     private CardView mCardEvidence, mCardVoting;
     private Button mBtnAccept, mBtnReject, mBtnSubmitEvidence, mBtnPickImage;
@@ -77,10 +77,12 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         mTextStatus              = findViewById(R.id.textViewDetailStatus);
         mTextDescription         = findViewById(R.id.textViewDetailDescription);
         mTextWinner              = findViewById(R.id.textViewDetailWinner);
-        mTextEvidenceChallenger  = findViewById(R.id.textViewEvidenceChallenger);
-        mTextEvidenceChallenged  = findViewById(R.id.textViewEvidenceChallenged);
-        mEditEvidence            = findViewById(R.id.editTextEvidence);
-        mImageEvidencePreview    = findViewById(R.id.imageViewEvidencePreview);
+        mTextEvidenceChallenger      = findViewById(R.id.textViewEvidenceChallenger);
+        mTextEvidenceChallenged      = findViewById(R.id.textViewEvidenceChallenged);
+        mEditEvidence                = findViewById(R.id.editTextEvidence);
+        mImageEvidencePreview        = findViewById(R.id.imageViewEvidencePreview);
+        mImageEvidenceChallengerImg  = findViewById(R.id.imageViewEvidenceChallengerImg);
+        mImageEvidenceChallengedImg  = findViewById(R.id.imageViewEvidenceChallengedImg);
         mLayoutAcceptReject      = findViewById(R.id.layoutAcceptReject);
         mLayoutEvidenceButtons   = findViewById(R.id.layoutEvidenceButtons);
         mCardEvidence            = findViewById(R.id.cardEvidence);
@@ -125,6 +127,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         mTextEvidenceChallenged.setVisibility(View.GONE);
         mEditEvidence.setVisibility(View.GONE);
         mImageEvidencePreview.setVisibility(View.GONE);
+        mImageEvidenceChallengerImg.setVisibility(View.GONE);
+        mImageEvidenceChallengedImg.setVisibility(View.GONE);
         mLayoutEvidenceButtons.setVisibility(View.GONE);
         mBtnFinish.setVisibility(View.GONE);
 
@@ -150,7 +154,7 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                     .addOnSuccessListener(u -> { Toast.makeText(this, "Desafío rechazado", Toast.LENGTH_SHORT).show(); finish(); }));
         }
 
-        // Evidence section (accepted)
+        // Evidence section (accepted / voting / finished)
         if ("accepted".equals(status) || "voting".equals(status) || "finished".equals(status)) {
             mCardEvidence.setVisibility(View.VISIBLE);
 
@@ -159,14 +163,13 @@ public class ChallengeDetailActivity extends AppCompatActivity {
 
             if (evC != null && !evC.isEmpty()) {
                 mTextEvidenceChallenger.setVisibility(View.VISIBLE);
-                mTextEvidenceChallenger.setText("@" + mChallengerUsername + ": " + evC);
+                renderEvidenceInView(mTextEvidenceChallenger, mImageEvidenceChallengerImg, "@" + mChallengerUsername, evC);
             }
             if (evD != null && !evD.isEmpty()) {
                 mTextEvidenceChallenged.setVisibility(View.VISIBLE);
-                mTextEvidenceChallenged.setText("@" + mChallengedUsername + ": " + evD);
+                renderEvidenceInView(mTextEvidenceChallenged, mImageEvidenceChallengedImg, "@" + mChallengedUsername, evD);
             }
 
-            // Show evidence input if this user hasn't submitted yet
             boolean needsEvidence = (isChallenger && (evC == null || evC.isEmpty()))
                     || (isChallenged && (evD == null || evD.isEmpty()));
             if (needsEvidence && "accepted".equals(status)) {
@@ -192,6 +195,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
 
             boolean canVote = !isChallenger && !isChallenged && "voting".equals(status);
             if (canVote) {
+                mBtnVoteChallenger.setEnabled(true);
+                mBtnVoteChallenged.setEnabled(true);
                 mBtnVoteChallenger.setOnClickListener(v -> mChallengesProvider.voteChallenger(mChallengeId, mMyId)
                         .addOnSuccessListener(u -> { Toast.makeText(this, "Votaste por @" + mChallengerUsername, Toast.LENGTH_SHORT).show(); loadChallenge(); }));
                 mBtnVoteChallenged.setOnClickListener(v -> mChallengesProvider.voteChallenged(mChallengeId, mMyId)
@@ -203,8 +208,40 @@ public class ChallengeDetailActivity extends AppCompatActivity {
 
             if (isChallenger && "voting".equals(status)) {
                 mBtnFinish.setVisibility(View.VISIBLE);
-                mBtnFinish.setOnClickListener(v -> declareWinner(vc, vd));
+                mBtnFinish.setEnabled(true);
+                int totalVotes = vc + vd;
+                if (totalVotes > 0) {
+                    mBtnFinish.setText("🏆 CERRAR VOTACIÓN Y DECLARAR GANADOR");
+                    mBtnFinish.setOnClickListener(v -> declareWinner(vc, vd));
+                } else {
+                    mBtnFinish.setText("⛔ CERRAR SIN GANADOR");
+                    mBtnFinish.setOnClickListener(v -> closeWithoutWinner());
+                }
             }
+        }
+    }
+
+    private void renderEvidenceInView(TextView tv, ImageView imgView, String username, String evidence) {
+        // Split off any trailing URL (appended as "text\nurl" on submit)
+        String[] parts = evidence.split("\n", 2);
+        String text = parts[0].trim();
+        String url = parts.length > 1 ? parts[1].trim() : null;
+
+        // If there's no text prefix the whole value may itself be a URL
+        if (text.startsWith("https://") || text.startsWith("http://")) {
+            url = text;
+            text = "";
+        }
+
+        if (text.isEmpty()) {
+            tv.setText(username + ": [imagen]");
+        } else {
+            tv.setText(username + ": " + text);
+        }
+
+        if (url != null && !url.isEmpty() && imgView != null) {
+            imgView.setVisibility(View.VISIBLE);
+            Picasso.get().load(url).into(imgView);
         }
     }
 
@@ -271,6 +308,13 @@ public class ChallengeDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Evidencia enviada. Esperando al otro jugador.", Toast.LENGTH_SHORT).show();
             loadChallenge();
         }
+    }
+
+    private void closeWithoutWinner() {
+        mChallengesProvider.finishNoWinner(mChallengeId).addOnSuccessListener(u -> {
+            Toast.makeText(this, "Votación cerrada. No se definió un ganador.", Toast.LENGTH_LONG).show();
+            loadChallenge();
+        });
     }
 
     private void declareWinner(int vc, int vd) {
