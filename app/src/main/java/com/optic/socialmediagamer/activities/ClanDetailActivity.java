@@ -171,6 +171,7 @@ public class ClanDetailActivity extends AppCompatActivity {
     }
 
     private void requestJoinClan() {
+        if (com.optic.socialmediagamer.utils.GuestGuard.check(this)) return;
         String myId = mAuthProvider.getUid();
         mClanProvider.requestJoin(mClanId, myId).addOnSuccessListener(u -> {
             Toast.makeText(this, "Solicitud enviada al líder ⏳", Toast.LENGTH_SHORT).show();

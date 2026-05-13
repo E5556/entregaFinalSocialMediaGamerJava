@@ -33,6 +33,8 @@ import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.FollowProvider;
 import com.optic.socialmediagamer.providers.ImageProvider;
 import com.optic.socialmediagamer.models.Poll;
+import com.optic.socialmediagamer.models.ActivityFeedItem;
+import com.optic.socialmediagamer.providers.ActivityFeedProvider;
 import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PollProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
@@ -223,6 +225,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void clickPost() {
+        if (com.optic.socialmediagamer.utils.GuestGuard.check(this)) return;
         mTitle = mTextInputTitle.getText().toString().trim();
         mDescription = mTextInputDescription.getText().toString().trim();
 
@@ -344,6 +347,19 @@ public class PostActivity extends AppCompatActivity {
                 mXPProvider.addXP(myId, RankHelper.XP_POST_CREATED);
                 new MissionsProvider().incrementProgress(myId, MissionsProvider.TYPE_POST);
                 notifyFollowers(myId, mTitle, post.getId());
+
+                // Activity feed
+                mUsersProvider.getUser(myId).addOnSuccessListener(userDoc -> {
+                    String username = userDoc.exists() && userDoc.getString("username") != null
+                            ? userDoc.getString("username") : "Gamer";
+                    ActivityFeedItem feedItem = new ActivityFeedItem();
+                    feedItem.setIdUser(myId);
+                    feedItem.setUsername(username);
+                    feedItem.setType("POST");
+                    feedItem.setMessage("publicó un nuevo post: " + mCategory);
+                    feedItem.setTimestamp(System.currentTimeMillis());
+                    new ActivityFeedProvider().save(feedItem);
+                });
 
                 if (withPoll) {
                     Poll poll = new Poll();

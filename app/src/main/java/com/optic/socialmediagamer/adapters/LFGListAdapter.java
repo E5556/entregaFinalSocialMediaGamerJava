@@ -97,6 +97,7 @@ public class LFGListAdapter extends RecyclerView.Adapter<LFGListAdapter.ViewHold
         loadPlayerNames(lfg.getPlayers(), holder.textViewPlayers);
 
         holder.buttonJoin.setOnClickListener(v -> {
+            if (com.optic.socialmediagamer.utils.GuestGuard.check(context)) return;
             if (hasJoined) {
                 mLFGProvider.leaveParty(lfgId, myId).addOnSuccessListener(u -> {
                     Toast.makeText(context, "Saliste de la party", Toast.LENGTH_SHORT).show();

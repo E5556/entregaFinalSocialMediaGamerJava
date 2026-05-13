@@ -272,6 +272,7 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void sendComment() {
+        if (com.optic.socialmediagamer.utils.GuestGuard.check(this)) return;
         String commentText = mTextInputComment.getText().toString().trim();
         if (commentText.isEmpty()) {
             Toast.makeText(this, "Escribe un comentario", Toast.LENGTH_SHORT).show();

@@ -143,6 +143,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void showChallengeDialog() {
+        if (com.optic.socialmediagamer.utils.GuestGuard.check(this)) return;
         android.widget.LinearLayout container = new android.widget.LinearLayout(this);
         container.setOrientation(android.widget.LinearLayout.VERTICAL);
         int pad = dpToPx(20);
@@ -235,6 +236,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void toggleFollow() {
+        if (com.optic.socialmediagamer.utils.GuestGuard.check(this)) return;
         String myId = mAuthProvider.getUid();
         if (myId == null) return;
 

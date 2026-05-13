@@ -58,11 +58,15 @@ public class AuthProvider {
     }
 
 
+    public boolean isGuest() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        return user != null && user.isAnonymous();
+    }
+
     public void logout() {
         if (mAuth != null) {
             mAuth.signOut();
         }
-
     }
 
 }
