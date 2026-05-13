@@ -78,6 +78,8 @@
         <activity android:name=".activities.GamerCardActivity" />
         <activity android:name=".activities.TournamentAlertsActivity" />
         <activity android:name=".activities.WeeklyChallengeActivity" />
+        <activity android:name=".activities.WeeklyProgressActivity" />
+        <activity android:name=".activities.SeasonActivity" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

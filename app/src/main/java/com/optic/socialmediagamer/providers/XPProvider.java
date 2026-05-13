@@ -31,25 +31,32 @@ public class XPProvider {
             return Tasks.forException(new IllegalArgumentException("amount debe estar entre 1 y " + MAX_XP_PER_ACTION));
         }
 
-        long currentWeekStart = getWeekStart();
+        long currentWeekStart  = getWeekStart();
+        long currentMonthStart = getMonthStart();
 
         return mFirestore.runTransaction(transaction -> {
             com.google.firebase.firestore.DocumentReference ref =
                     mFirestore.collection("Users").document(userId);
             com.google.firebase.firestore.DocumentSnapshot snap = transaction.get(ref);
 
-            long weeklyXpResetAt = snap.getLong("weeklyXpResetAt") != null
-                    ? snap.getLong("weeklyXpResetAt") : 0L;
+            long weeklyXpResetAt  = snap.getLong("weeklyXpResetAt")  != null ? snap.getLong("weeklyXpResetAt")  : 0L;
+            long seasonXpResetAt  = snap.getLong("seasonXpResetAt")  != null ? snap.getLong("seasonXpResetAt")  : 0L;
 
             Map<String, Object> update = new HashMap<>();
             update.put("xp", FieldValue.increment(amount));
 
             if (weeklyXpResetAt < currentWeekStart) {
-                // Nueva semana: reiniciar weeklyXp
                 update.put("weeklyXp", amount);
                 update.put("weeklyXpResetAt", currentWeekStart);
             } else {
                 update.put("weeklyXp", FieldValue.increment(amount));
+            }
+
+            if (seasonXpResetAt < currentMonthStart) {
+                update.put("seasonXp", amount);
+                update.put("seasonXpResetAt", currentMonthStart);
+            } else {
+                update.put("seasonXp", FieldValue.increment(amount));
             }
 
             transaction.update(ref, update);
@@ -60,6 +67,16 @@ public class XPProvider {
     private long getWeekStart() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
+    public static long getMonthStart() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);

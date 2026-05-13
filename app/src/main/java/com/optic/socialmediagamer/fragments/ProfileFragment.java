@@ -36,7 +36,9 @@ import com.optic.socialmediagamer.activities.EditProfileActivity;
 import com.optic.socialmediagamer.activities.MyCollectionsActivity;
 import com.optic.socialmediagamer.activities.ClansActivity;
 import com.optic.socialmediagamer.activities.GamerCardActivity;
+import com.optic.socialmediagamer.activities.SeasonActivity;
 import com.optic.socialmediagamer.activities.WeeklyChallengeActivity;
+import com.optic.socialmediagamer.activities.WeeklyProgressActivity;
 import com.optic.socialmediagamer.activities.MyChallengesActivity;
 import com.optic.socialmediagamer.activities.WeeklyMissionsActivity;
 import com.optic.socialmediagamer.providers.AuthProvider;
@@ -155,6 +157,12 @@ public class ProfileFragment extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         mLinearLayoutEditProfile.setOnClickListener(view -> goToEditProfile());
+
+        mView.findViewById(R.id.layoutWeeklyProgress).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), WeeklyProgressActivity.class)));
+
+        mView.findViewById(R.id.layoutSeason).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), SeasonActivity.class)));
 
         mView.findViewById(R.id.layoutGamerCard).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), GamerCardActivity.class)));

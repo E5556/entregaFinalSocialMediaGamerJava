@@ -13,6 +13,7 @@ public class Badge {
     public static final String RACHA_7 = "RACHA_7";
     public static final String RACHA_30 = "RACHA_30";
     public static final String RACHA_100 = "RACHA_100";
+    public static final String CAMPEON_TEMPORADA = "CAMPEON_TEMPORADA";
 
     private String id;
     private String idUser;
@@ -51,8 +52,9 @@ public class Badge {
             case NINTENDO_FAN:  return "❤️";
             case RACHA_7:       return "🔥";
             case RACHA_30:      return "💥";
-            case RACHA_100:     return "👑";
-            default:            return "🏆";
+            case RACHA_100:          return "👑";
+            case CAMPEON_TEMPORADA:  return "🏅";
+            default:                 return "🏆";
         }
     }
 
@@ -68,8 +70,9 @@ public class Badge {
             case NINTENDO_FAN:  return "Nintendo Fan";
             case RACHA_7:       return "Racha 7 días";
             case RACHA_30:      return "Racha 30 días";
-            case RACHA_100:     return "Racha 100 días";
-            default:            return "Logro";
+            case RACHA_100:          return "Racha 100 días";
+            case CAMPEON_TEMPORADA:  return "Campeón de Temporada";
+            default:                 return "Logro";
         }
     }
 }
