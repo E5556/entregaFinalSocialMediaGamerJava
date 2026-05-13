@@ -52,7 +52,22 @@ public class CompleteProfileActivity extends AppCompatActivity {
                 .setMessage("Espere un momento")
                 .setCancelable(false).build();
 
-        mButtonRegister.setOnClickListener(view -> register()); // objeto de escucha para el botón de registro
+        mButtonRegister.setOnClickListener(view -> register());
+    }
+
+    @Override
+    public void onBackPressed() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("¿Cancelar registro?")
+                .setMessage("Si sales ahora tu cuenta quedará incompleta y será eliminada.")
+                .setPositiveButton("SALIR Y CANCELAR", (d, w) -> {
+                    mAuthProvider.logout();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Continuar registro", null)
+                .show();
     }
 
     private void register() { // Método para registrar usuario

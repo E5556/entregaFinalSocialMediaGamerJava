@@ -46,6 +46,7 @@ public class HomeActivity extends AppCompatActivity {
         mNotificationsProvider = new NotificationsProvider();
         mAuthProvider = new AuthProvider();
         listenUnreadBadge();
+        checkProfileComplete();
         new UsersProvider().updateStreak(mAuthProvider.getUid());
     }
 
@@ -72,6 +73,17 @@ public class HomeActivity extends AppCompatActivity {
                 .show(target)
                 .commit();
         mActiveFragment = target;
+    }
+
+    private void checkProfileComplete() {
+        String uid = mAuthProvider.getUid();
+        if (uid == null || mAuthProvider.isGuest()) return;
+        new UsersProvider().getUser(uid).addOnSuccessListener(doc -> {
+            String username = doc.getString("username");
+            if (username == null || username.trim().isEmpty()) {
+                startActivity(new Intent(this, CompleteProfileActivity.class));
+            }
+        });
     }
 
     private void listenUnreadBadge() {
