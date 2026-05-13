@@ -189,7 +189,9 @@ public class MainActivity extends AppCompatActivity {
     // ── Google login ──────────────────────────────────────────────────────────
 
     private void signInGoogle() {
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_GOOGLE);
+        // Sign out from Google client first to force account picker every time
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, t ->
+                startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_GOOGLE));
     }
 
     @Override
