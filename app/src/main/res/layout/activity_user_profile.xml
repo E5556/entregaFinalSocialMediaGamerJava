@@ -197,6 +197,23 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Habilidades endorsadas -->
+            <LinearLayout
+                android:id="@+id/layoutSkillsSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_surface"
+                android:padding="16dp"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/dividerSkills"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/color_divider"
+                android:visibility="gone" />
+
             <!-- Gamer Score / Reputación -->
             <LinearLayout
                 android:id="@+id/layoutReputationSection"

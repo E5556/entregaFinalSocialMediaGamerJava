@@ -285,6 +285,10 @@ public class UserProfileActivity extends AppCompatActivity {
         String myId = mAuthProvider.getUid();
         boolean isOwnProfile = myId != null && myId.equals(mIdUser);
 
+        android.widget.LinearLayout layoutSection = findViewById(R.id.layoutSkillsSection);
+        View divider = findViewById(R.id.dividerSkills);
+        if (layoutSection == null) return;
+
         mEndorsementsProvider.getEndorsementsForUser(mIdUser).addOnSuccessListener(snap -> {
             Map<String, Integer> counts = new HashMap<>();
             for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
@@ -293,24 +297,26 @@ public class UserProfileActivity extends AppCompatActivity {
                 counts.put(e.getSkill(), counts.getOrDefault(e.getSkill(), 0) + 1);
             }
 
-            // Only show section if there are endorsements OR we can endorse (other user's profile)
+            // Hide section on own profile if no endorsements
             if (counts.isEmpty() && isOwnProfile) return;
 
-            android.widget.LinearLayout layoutSkills = new android.widget.LinearLayout(this);
-            layoutSkills.setOrientation(android.widget.LinearLayout.VERTICAL);
-            layoutSkills.setPadding(32, 24, 32, 8);
+            // Clear and rebuild — prevents duplication on reload
+            layoutSection.removeAllViews();
+            layoutSection.setVisibility(View.VISIBLE);
+            if (divider != null) divider.setVisibility(View.VISIBLE);
 
             android.widget.TextView tvLabel = new android.widget.TextView(this);
             tvLabel.setText("🏷️ HABILIDADES");
             tvLabel.setTextColor(getColor(R.color.color_primary));
             tvLabel.setTextSize(11f);
             tvLabel.setTypeface(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD);
-            layoutSkills.addView(tvLabel);
+            tvLabel.setPadding(0, 0, 0, dpToPx(8));
+            layoutSection.addView(tvLabel);
 
             android.widget.LinearLayout layoutTags = new android.widget.LinearLayout(this);
             layoutTags.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-            layoutTags.setPadding(0, 8, 0, 8);
-            layoutSkills.addView(layoutTags);
+            layoutTags.setPadding(0, 0, 0, dpToPx(8));
+            layoutSection.addView(layoutTags);
 
             if (counts.isEmpty()) {
                 android.widget.TextView tvEmpty = new android.widget.TextView(this);
@@ -323,7 +329,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     String skill = entry.getKey();
                     int count = entry.getValue();
                     android.widget.TextView chip = new android.widget.TextView(this);
-                    chip.setText(SkillEndorsement.getEmoji(skill) + " " + SkillEndorsement.getLabel(skill) + " (" + count + ")");
+                    chip.setText(SkillEndorsement.getEmoji(skill) + " " + SkillEndorsement.getLabel(skill) + " ×" + count);
                     chip.setTextSize(12f);
                     chip.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
                     chip.setBackgroundColor(getColor(count >= 3 ? R.color.color_primary : R.color.color_surface_2));
@@ -338,21 +344,17 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             }
 
-            // Endorse button always visible on other users' profiles
+            // Single endorse button, always at the bottom, only for other users
             if (!isOwnProfile) {
                 android.widget.Button btnEndorse = new android.widget.Button(this);
-                btnEndorse.setText("+ ENDORSAR");
+                btnEndorse.setText("+ ENDORSAR HABILIDAD");
                 btnEndorse.setTextSize(11f);
+                android.widget.LinearLayout.LayoutParams btnLp = new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                btnEndorse.setLayoutParams(btnLp);
                 btnEndorse.setOnClickListener(v -> showEndorseDialog(myId));
-                layoutSkills.addView(btnEndorse);
-            }
-
-            // Insert before reputation section
-            android.widget.LinearLayout reputationSection = findViewById(R.id.layoutReputationSection);
-            if (reputationSection != null && reputationSection.getParent() instanceof android.widget.LinearLayout) {
-                android.widget.LinearLayout parent = (android.widget.LinearLayout) reputationSection.getParent();
-                int idx = parent.indexOfChild(reputationSection);
-                parent.addView(layoutSkills, idx);
+                layoutSection.addView(btnEndorse);
             }
         });
     }
