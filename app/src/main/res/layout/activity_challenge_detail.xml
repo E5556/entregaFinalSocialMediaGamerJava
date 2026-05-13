@@ -182,7 +182,7 @@
                         android:id="@+id/editTextEvidence"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Describe tu evidencia (resultado, screenshot, etc.)"
+                        android:hint="Describe tu evidencia (resultado, etc.)"
                         android:textColor="@color/color_text_primary"
                         android:textColorHint="@color/color_text_secondary"
                         android:background="@color/color_surface_2"
@@ -191,18 +191,48 @@
                         android:minLines="2"
                         android:visibility="gone" />
 
-                    <Button
-                        android:id="@+id/buttonSubmitEvidence"
+                    <ImageView
+                        android:id="@+id/imageViewEvidencePreview"
                         android:layout_width="match_parent"
-                        android:layout_height="36dp"
-                        android:text="ENVIAR EVIDENCIA"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:backgroundTint="@color/color_secondary"
-                        android:textColor="@color/colorWhite"
+                        android:layout_height="160dp"
+                        android:scaleType="centerCrop"
                         android:layout_marginTop="8dp"
+                        android:background="@color/color_surface_2"
                         android:visibility="gone" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        android:id="@+id/layoutEvidenceButtons">
+
+                        <Button
+                            android:id="@+id/buttonPickEvidenceImage"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="📷 IMAGEN"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"
+                            android:backgroundTint="@color/color_surface_2"
+                            android:textColor="@color/color_text_primary"
+                            android:layout_marginEnd="6dp" />
+
+                        <Button
+                            android:id="@+id/buttonSubmitEvidence"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="2"
+                            android:text="ENVIAR EVIDENCIA"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"
+                            android:backgroundTint="@color/color_secondary"
+                            android:textColor="@color/colorWhite" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

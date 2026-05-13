@@ -1,25 +1,36 @@
 package com.optic.socialmediagamer.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.squareup.picasso.Picasso;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.optic.socialmediagamer.R;
+import com.optic.socialmediagamer.models.ActivityFeedItem;
 import com.optic.socialmediagamer.models.Challenge;
+import com.optic.socialmediagamer.providers.ActivityFeedProvider;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.ChallengesProvider;
 import com.optic.socialmediagamer.providers.ClanProvider;
+import com.optic.socialmediagamer.providers.ImageProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
+import com.optic.socialmediagamer.utils.FileUtil;
 
+import java.io.File;
 import java.util.List;
 
 public class ChallengeDetailActivity extends AppCompatActivity {
@@ -30,10 +41,16 @@ public class ChallengeDetailActivity extends AppCompatActivity {
     private TextView mTextPlayers, mTextStatus, mTextDescription, mTextWinner;
     private TextView mTextEvidenceChallenger, mTextEvidenceChallenged;
     private EditText mEditEvidence;
-    private LinearLayout mLayoutAcceptReject;
+    private ImageView mImageEvidencePreview;
+    private LinearLayout mLayoutAcceptReject, mLayoutEvidenceButtons;
     private CardView mCardEvidence, mCardVoting;
-    private Button mBtnAccept, mBtnReject, mBtnSubmitEvidence;
+    private Button mBtnAccept, mBtnReject, mBtnSubmitEvidence, mBtnPickImage;
     private Button mBtnVoteChallenger, mBtnVoteChallenged, mBtnFinish;
+
+    private static final int GALLERY_REQUEST = 77;
+    private File mEvidenceImageFile;
+    private String mEvidenceImageUrl = null;
+    private final ImageProvider mImageProvider = new ImageProvider();
 
     private final AuthProvider mAuthProvider = new AuthProvider();
     private final ChallengesProvider mChallengesProvider = new ChallengesProvider();
@@ -56,22 +73,25 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbarChallengeDetail));
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mTextPlayers          = findViewById(R.id.textViewDetailPlayers);
-        mTextStatus           = findViewById(R.id.textViewDetailStatus);
-        mTextDescription      = findViewById(R.id.textViewDetailDescription);
-        mTextWinner           = findViewById(R.id.textViewDetailWinner);
-        mTextEvidenceChallenger = findViewById(R.id.textViewEvidenceChallenger);
-        mTextEvidenceChallenged = findViewById(R.id.textViewEvidenceChallenged);
-        mEditEvidence         = findViewById(R.id.editTextEvidence);
-        mLayoutAcceptReject   = findViewById(R.id.layoutAcceptReject);
-        mCardEvidence         = findViewById(R.id.cardEvidence);
-        mCardVoting           = findViewById(R.id.cardVoting);
-        mBtnAccept            = findViewById(R.id.buttonAccept);
-        mBtnReject            = findViewById(R.id.buttonReject);
-        mBtnSubmitEvidence    = findViewById(R.id.buttonSubmitEvidence);
-        mBtnVoteChallenger    = findViewById(R.id.buttonVoteChallenger);
-        mBtnVoteChallenged    = findViewById(R.id.buttonVoteChallenged);
-        mBtnFinish            = findViewById(R.id.buttonFinish);
+        mTextPlayers             = findViewById(R.id.textViewDetailPlayers);
+        mTextStatus              = findViewById(R.id.textViewDetailStatus);
+        mTextDescription         = findViewById(R.id.textViewDetailDescription);
+        mTextWinner              = findViewById(R.id.textViewDetailWinner);
+        mTextEvidenceChallenger  = findViewById(R.id.textViewEvidenceChallenger);
+        mTextEvidenceChallenged  = findViewById(R.id.textViewEvidenceChallenged);
+        mEditEvidence            = findViewById(R.id.editTextEvidence);
+        mImageEvidencePreview    = findViewById(R.id.imageViewEvidencePreview);
+        mLayoutAcceptReject      = findViewById(R.id.layoutAcceptReject);
+        mLayoutEvidenceButtons   = findViewById(R.id.layoutEvidenceButtons);
+        mCardEvidence            = findViewById(R.id.cardEvidence);
+        mCardVoting              = findViewById(R.id.cardVoting);
+        mBtnAccept               = findViewById(R.id.buttonAccept);
+        mBtnReject               = findViewById(R.id.buttonReject);
+        mBtnSubmitEvidence       = findViewById(R.id.buttonSubmitEvidence);
+        mBtnPickImage            = findViewById(R.id.buttonPickEvidenceImage);
+        mBtnVoteChallenger       = findViewById(R.id.buttonVoteChallenger);
+        mBtnVoteChallenged       = findViewById(R.id.buttonVoteChallenged);
+        mBtnFinish               = findViewById(R.id.buttonFinish);
 
         loadChallenge();
     }
@@ -96,6 +116,18 @@ public class ChallengeDetailActivity extends AppCompatActivity {
     }
 
     private void renderChallenge() {
+        // Reset all sections before rendering to avoid stale state on reload
+        mLayoutAcceptReject.setVisibility(View.GONE);
+        mCardEvidence.setVisibility(View.GONE);
+        mCardVoting.setVisibility(View.GONE);
+        mTextWinner.setVisibility(View.GONE);
+        mTextEvidenceChallenger.setVisibility(View.GONE);
+        mTextEvidenceChallenged.setVisibility(View.GONE);
+        mEditEvidence.setVisibility(View.GONE);
+        mImageEvidencePreview.setVisibility(View.GONE);
+        mLayoutEvidenceButtons.setVisibility(View.GONE);
+        mBtnFinish.setVisibility(View.GONE);
+
         String status = mChallenge.getStatus();
         boolean isChallenger = mMyId != null && mMyId.equals(mChallenge.getIdChallenger());
         boolean isChallenged = mMyId != null && mMyId.equals(mChallenge.getIdChallenged());
@@ -139,7 +171,12 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                     || (isChallenged && (evD == null || evD.isEmpty()));
             if (needsEvidence && "accepted".equals(status)) {
                 mEditEvidence.setVisibility(View.VISIBLE);
-                mBtnSubmitEvidence.setVisibility(View.VISIBLE);
+                mLayoutEvidenceButtons.setVisibility(View.VISIBLE);
+                mBtnPickImage.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    startActivityForResult(Intent.createChooser(intent, "Seleccionar imagen"), GALLERY_REQUEST);
+                });
                 mBtnSubmitEvidence.setOnClickListener(v -> submitEvidence(isChallenger, evC, evD));
             }
         }
@@ -173,12 +210,53 @@ public class ChallengeDetailActivity extends AppCompatActivity {
 
     private void submitEvidence(boolean isChallenger, String evC, String evD) {
         String text = mEditEvidence.getText().toString().trim();
-        if (text.isEmpty()) { Toast.makeText(this, "Escribe tu evidencia", Toast.LENGTH_SHORT).show(); return; }
+        if (text.isEmpty() && mEvidenceImageFile == null) {
+            Toast.makeText(this, "Escribe tu evidencia o adjunta una imagen", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        if (isChallenger) {
-            mChallengesProvider.submitEvidenceChallenger(mChallengeId, text).addOnSuccessListener(u -> checkOpenVoting(text, evD));
+        if (mEvidenceImageFile != null) {
+            mBtnSubmitEvidence.setEnabled(false);
+            mBtnSubmitEvidence.setText("Subiendo...");
+            mImageProvider.save(this, mEvidenceImageFile).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    mBtnSubmitEvidence.setEnabled(true);
+                    mBtnSubmitEvidence.setText("ENVIAR EVIDENCIA");
+                    Toast.makeText(this, "Error al subir imagen", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mImageProvider.getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
+                    String combined = text.isEmpty() ? uri.toString() : text + "\n" + uri.toString();
+                    saveEvidence(isChallenger, combined, evC, evD);
+                });
+            });
         } else {
-            mChallengesProvider.submitEvidenceChallenged(mChallengeId, text).addOnSuccessListener(u -> checkOpenVoting(evC, text));
+            saveEvidence(isChallenger, text, evC, evD);
+        }
+    }
+
+    private void saveEvidence(boolean isChallenger, String evidence, String evC, String evD) {
+        if (isChallenger) {
+            mChallengesProvider.submitEvidenceChallenger(mChallengeId, evidence)
+                    .addOnSuccessListener(u -> checkOpenVoting(evidence, evD));
+        } else {
+            mChallengesProvider.submitEvidenceChallenged(mChallengeId, evidence)
+                    .addOnSuccessListener(u -> checkOpenVoting(evC, evidence));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+            try {
+                mEvidenceImageFile = FileUtil.from(this, uri);
+                mImageEvidencePreview.setVisibility(View.VISIBLE);
+                Picasso.get().load(uri).into(mImageEvidencePreview);
+            } catch (Exception e) {
+                Toast.makeText(this, "Error al cargar imagen", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -208,6 +286,14 @@ public class ChallengeDetailActivity extends AppCompatActivity {
             mXPProvider.addXP(winnerUid, 30);
             mClanProvider.awardClanXPForUser(winnerUid, 30);
             Toast.makeText(this, "🏆 ¡@" + winnerUsername + " ganó el desafío! +30 XP", Toast.LENGTH_LONG).show();
+            // Activity feed
+            ActivityFeedItem feedItem = new ActivityFeedItem();
+            feedItem.setIdUser(winnerUid);
+            feedItem.setUsername(winnerUsername);
+            feedItem.setType("CHALLENGE_WIN");
+            feedItem.setMessage("ganó un desafío ⚔️");
+            feedItem.setTimestamp(System.currentTimeMillis());
+            new ActivityFeedProvider().save(feedItem);
             loadChallenge();
         });
     }
