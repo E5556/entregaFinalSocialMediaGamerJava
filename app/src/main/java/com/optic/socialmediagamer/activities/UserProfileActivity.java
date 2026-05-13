@@ -143,13 +143,23 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void showChallengeDialog() {
+        android.widget.LinearLayout container = new android.widget.LinearLayout(this);
+        container.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = dpToPx(20);
+        container.setPadding(pad, dpToPx(8), pad, 0);
+
         android.widget.EditText et = new android.widget.EditText(this);
         et.setHint("Describe el desafío (ej: primero en llegar a Gold)");
-        et.setPadding(48, 24, 48, 8);
+        et.setMinLines(2);
+        et.setMaxLines(4);
+        et.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        et.setTextColor(getColor(R.color.color_text_primary));
+        et.setHintTextColor(getColor(R.color.color_text_secondary));
+        container.addView(et);
 
         new android.app.AlertDialog.Builder(this)
                 .setTitle("⚔️ Enviar desafío")
-                .setView(et)
+                .setView(container)
                 .setPositiveButton("ENVIAR", (d, w) -> {
                     String desc = et.getText().toString().trim();
                     if (desc.isEmpty()) { Toast.makeText(this, "Escribe el desafío", Toast.LENGTH_SHORT).show(); return; }
