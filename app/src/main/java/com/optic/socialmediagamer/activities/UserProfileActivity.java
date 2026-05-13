@@ -24,15 +24,20 @@ import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
 import com.optic.socialmediagamer.providers.ChallengesProvider;
+import com.optic.socialmediagamer.providers.EndorsementsProvider;
 import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.ReputationProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
 import com.optic.socialmediagamer.models.Challenge;
+import com.optic.socialmediagamer.models.SkillEndorsement;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -56,6 +61,7 @@ public class UserProfileActivity extends AppCompatActivity {
     XPProvider mXPProvider;
     ReputationProvider mReputationProvider;
     ChallengesProvider mChallengesProvider;
+    EndorsementsProvider mEndorsementsProvider;
     PostsAdapter mPostsAdapter;
 
     String mIdUser;
@@ -86,6 +92,7 @@ public class UserProfileActivity extends AppCompatActivity {
         mXPProvider = new XPProvider();
         mReputationProvider = new ReputationProvider();
         mChallengesProvider = new ChallengesProvider();
+        mEndorsementsProvider = new EndorsementsProvider();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mCircleImageBack.setOnClickListener(v -> finish());
@@ -104,6 +111,7 @@ public class UserProfileActivity extends AppCompatActivity {
         loadFollowersCount();
         checkIfFollowing();
         loadReputation();
+        loadEndorsements();
     }
 
     private void loadUserData() {
@@ -151,8 +159,21 @@ public class UserProfileActivity extends AppCompatActivity {
                     c.setIdChallenged(mIdUser);
                     c.setDescription(desc);
                     c.setTimestamp(System.currentTimeMillis());
-                    mChallengesProvider.send(c).addOnSuccessListener(u ->
-                            Toast.makeText(this, "¡Desafío enviado! ⚔️", Toast.LENGTH_SHORT).show());
+                    mChallengesProvider.send(c).addOnSuccessListener(u -> {
+                        Toast.makeText(this, "¡Desafío enviado! ⚔️", Toast.LENGTH_SHORT).show();
+                        // FCM to challenged
+                        mUsersProvider.getUser(senderId).addOnSuccessListener(senderDoc -> {
+                            String senderUsername = senderDoc.exists() && senderDoc.getString("username") != null
+                                    ? senderDoc.getString("username") : "Alguien";
+                            mUsersProvider.getUser(mIdUser).addOnSuccessListener(ownerDoc -> {
+                                String token = ownerDoc.getString("fcmToken");
+                                if (token != null && !token.isEmpty()) {
+                                    FCMSender.send(getApplicationContext(), token,
+                                            "⚔️ Nuevo desafío", "@" + senderUsername + " te ha desafiado");
+                                }
+                            });
+                        });
+                    });
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
@@ -258,6 +279,122 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    private void loadEndorsements() {
+        String myId = mAuthProvider.getUid();
+        boolean isOwnProfile = myId != null && myId.equals(mIdUser);
+
+        mEndorsementsProvider.getEndorsementsForUser(mIdUser).addOnSuccessListener(snap -> {
+            Map<String, Integer> counts = new HashMap<>();
+            for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                SkillEndorsement e = doc.toObject(SkillEndorsement.class);
+                if (e == null || e.getSkill() == null) continue;
+                counts.put(e.getSkill(), counts.getOrDefault(e.getSkill(), 0) + 1);
+            }
+
+            // Only show section if there are endorsements OR we can endorse (other user's profile)
+            if (counts.isEmpty() && isOwnProfile) return;
+
+            android.widget.LinearLayout layoutSkills = new android.widget.LinearLayout(this);
+            layoutSkills.setOrientation(android.widget.LinearLayout.VERTICAL);
+            layoutSkills.setPadding(32, 24, 32, 8);
+
+            android.widget.TextView tvLabel = new android.widget.TextView(this);
+            tvLabel.setText("🏷️ HABILIDADES");
+            tvLabel.setTextColor(getColor(R.color.color_primary));
+            tvLabel.setTextSize(11f);
+            tvLabel.setTypeface(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD);
+            layoutSkills.addView(tvLabel);
+
+            android.widget.LinearLayout layoutTags = new android.widget.LinearLayout(this);
+            layoutTags.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            layoutTags.setPadding(0, 8, 0, 8);
+            layoutSkills.addView(layoutTags);
+
+            if (counts.isEmpty()) {
+                android.widget.TextView tvEmpty = new android.widget.TextView(this);
+                tvEmpty.setText("Sin habilidades endorsadas aún");
+                tvEmpty.setTextColor(getColor(R.color.color_text_secondary));
+                tvEmpty.setTextSize(12f);
+                layoutTags.addView(tvEmpty);
+            } else {
+                for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+                    String skill = entry.getKey();
+                    int count = entry.getValue();
+                    android.widget.TextView chip = new android.widget.TextView(this);
+                    chip.setText(SkillEndorsement.getEmoji(skill) + " " + SkillEndorsement.getLabel(skill) + " (" + count + ")");
+                    chip.setTextSize(12f);
+                    chip.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
+                    chip.setBackgroundColor(getColor(count >= 3 ? R.color.color_primary : R.color.color_surface_2));
+                    chip.setTextColor(getColor(count >= 3 ? R.color.color_background : R.color.color_text_primary));
+                    android.widget.LinearLayout.LayoutParams lp =
+                            new android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    lp.setMargins(0, 0, dpToPx(6), 0);
+                    chip.setLayoutParams(lp);
+                    layoutTags.addView(chip);
+                }
+            }
+
+            // Endorse button always visible on other users' profiles
+            if (!isOwnProfile) {
+                android.widget.Button btnEndorse = new android.widget.Button(this);
+                btnEndorse.setText("+ ENDORSAR");
+                btnEndorse.setTextSize(11f);
+                btnEndorse.setOnClickListener(v -> showEndorseDialog(myId));
+                layoutSkills.addView(btnEndorse);
+            }
+
+            // Insert before reputation section
+            android.widget.LinearLayout reputationSection = findViewById(R.id.layoutReputationSection);
+            if (reputationSection != null && reputationSection.getParent() instanceof android.widget.LinearLayout) {
+                android.widget.LinearLayout parent = (android.widget.LinearLayout) reputationSection.getParent();
+                int idx = parent.indexOfChild(reputationSection);
+                parent.addView(layoutSkills, idx);
+            }
+        });
+    }
+
+    private void showEndorseDialog(String myId) {
+        String[] skills = {
+                SkillEndorsement.BUEN_PUNTERO,
+                SkillEndorsement.ESTRATEGA,
+                SkillEndorsement.BUEN_COMPANERO,
+                SkillEndorsement.LIDER,
+                SkillEndorsement.COACH
+        };
+        String[] labels = {
+                SkillEndorsement.getEmoji(SkillEndorsement.BUEN_PUNTERO) + " " + SkillEndorsement.getLabel(SkillEndorsement.BUEN_PUNTERO),
+                SkillEndorsement.getEmoji(SkillEndorsement.ESTRATEGA) + " " + SkillEndorsement.getLabel(SkillEndorsement.ESTRATEGA),
+                SkillEndorsement.getEmoji(SkillEndorsement.BUEN_COMPANERO) + " " + SkillEndorsement.getLabel(SkillEndorsement.BUEN_COMPANERO),
+                SkillEndorsement.getEmoji(SkillEndorsement.LIDER) + " " + SkillEndorsement.getLabel(SkillEndorsement.LIDER),
+                SkillEndorsement.getEmoji(SkillEndorsement.COACH) + " " + SkillEndorsement.getLabel(SkillEndorsement.COACH)
+        };
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("🏷️ Endorsar habilidad")
+                .setItems(labels, (d, which) -> {
+                    String skill = skills[which];
+                    mEndorsementsProvider.hasEndorsed(myId, mIdUser, skill).addOnSuccessListener(snap -> {
+                        if (!snap.isEmpty()) {
+                            Toast.makeText(this, "Ya endorsaste esta habilidad", Toast.LENGTH_SHORT).show();
+                        } else {
+                            mEndorsementsProvider.endorse(myId, mIdUser, skill).addOnSuccessListener(u -> {
+                                Toast.makeText(this, "¡Endorsado! 🏷️", Toast.LENGTH_SHORT).show();
+                                loadEndorsements();
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     @Override
