@@ -52,6 +52,7 @@
             android:name=".activities.HomeActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.PhoneLoginActivity" />
         <activity
             android:name=".activities.MainActivity"
             android:exported="false" />

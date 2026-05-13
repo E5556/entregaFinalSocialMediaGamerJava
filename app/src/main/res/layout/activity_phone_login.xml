@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_background">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarPhoneLogin"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_surface"
+        android:title="📱 Ingresar con teléfono"
+        android:titleTextColor="@color/color_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📱"
+                android:textSize="48sp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/textPhoneInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ingresa tu número con código de país.\nEj: +57 3001234567"
+                android:textColor="@color/color_text_secondary"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="+57 3001234567"
+                    android:inputType="phone"
+                    android:maxLength="20"
+                    android:textColor="@color/color_text_primary" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btnSendCode"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="ENVIAR CÓDIGO SMS"
+                android:fontFamily="monospace"
+                android:textStyle="bold"
+                android:backgroundTint="@color/color_primary"
+                android:textColor="@color/color_background"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Code section (hidden until SMS sent) -->
+            <LinearLayout
+                android:id="@+id/layoutCodeSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Código de 6 dígitos"
+                        android:inputType="numberPassword"
+                        android:maxLength="6"
+                        android:textColor="@color/color_text_primary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/btnVerifyCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="VERIFICAR Y ENTRAR"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/color_secondary"
+                    android:textColor="@color/colorWhite" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -135,31 +135,83 @@
 
         </LinearLayout>
 
-        <!-- Google button (custom, minimal) -->
-        <Button
-            android:id="@+id/btnLoginGoogle"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="  Continuar con Google"
-            android:fontFamily="monospace"
-            android:textSize="13sp"
-            android:textColor="@color/color_text_primary"
-            android:backgroundTint="@color/color_surface"
-            android:drawableStart="@drawable/ic_google"
-            android:drawablePadding="8dp"
-            android:layout_marginBottom="10dp" />
+        <!-- Social login icons row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
-        <!-- Guest / Anonymous -->
-        <Button
-            android:id="@+id/btnLoginGuest"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="👾  Explorar como invitado"
-            android:fontFamily="monospace"
-            android:textSize="12sp"
-            android:textColor="@color/color_text_secondary"
-            android:backgroundTint="@color/color_surface_2"
-            android:layout_marginBottom="32dp" />
+            <!-- Google icon button -->
+            <ImageButton
+                android:id="@+id/btnLoginGoogle"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:src="@drawable/ic_google"
+                android:background="@drawable/bg_social_btn"
+                android:padding="12dp"
+                android:contentDescription="Iniciar sesión con Google"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Phone icon button -->
+            <ImageButton
+                android:id="@+id/btnLoginPhone"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:src="@drawable/ic_phone_login"
+                android:background="@drawable/bg_social_btn"
+                android:padding="12dp"
+                android:contentDescription="Iniciar sesión con teléfono"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Guest icon button -->
+            <ImageButton
+                android:id="@+id/btnLoginGuest"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:src="@drawable/ic_guest_login"
+                android:background="@drawable/bg_social_btn"
+                android:padding="12dp"
+                android:contentDescription="Entrar como invitado" />
+
+        </LinearLayout>
+
+        <!-- Labels under icons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="28dp">
+
+            <TextView
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:text="Google"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:text="Teléfono"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:text="Invitado"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:textColor="@color/color_text_secondary" />
+
+        </LinearLayout>
 
         <!-- Register link -->
         <LinearLayout

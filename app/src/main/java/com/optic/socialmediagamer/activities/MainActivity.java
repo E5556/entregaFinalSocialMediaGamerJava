@@ -9,6 +9,7 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextInputLayout  mLayoutEmail, mLayoutPassword;
     private TextInputEditText mTextInputEmail, mTextInputPassword;
-    private Button mButtonLogin, mButtonGoogle, mButtonGuest;
+    private Button mButtonLogin;
+    private ImageButton mButtonGoogle, mButtonPhone, mButtonGuest;
     private TextView mTextViewRegister, mTextViewForgotPassword, mTextViewRateLimit;
 
     private AuthProvider mAuthProvider;
@@ -60,9 +62,10 @@ public class MainActivity extends AppCompatActivity {
         mLayoutPassword = findViewById(R.id.layoutPassword);
         mTextInputEmail    = findViewById(R.id.textInputEmail);
         mTextInputPassword = findViewById(R.id.textInputPassword);
-        mButtonLogin   = findViewById(R.id.btnLogin);
-        mButtonGoogle  = findViewById(R.id.btnLoginGoogle);
-        mButtonGuest   = findViewById(R.id.btnLoginGuest);
+        mButtonLogin  = findViewById(R.id.btnLogin);
+        mButtonGoogle = findViewById(R.id.btnLoginGoogle);
+        mButtonPhone  = findViewById(R.id.btnLoginPhone);
+        mButtonGuest  = findViewById(R.id.btnLoginGuest);
         mTextViewRegister      = findViewById(R.id.textViewRegister);
         mTextViewForgotPassword = findViewById(R.id.textViewForgotPassword);
         mTextViewRateLimit     = findViewById(R.id.textViewRateLimit);
@@ -80,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         mButtonLogin.setOnClickListener(v -> login());
         mButtonGoogle.setOnClickListener(v -> signInGoogle());
+        mButtonPhone.setOnClickListener(v -> signInWithPhone());
         mButtonGuest.setOnClickListener(v -> signInAsGuest());
         mTextViewRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
@@ -224,6 +228,12 @@ public class MainActivity extends AppCompatActivity {
                     });
                 })
                 .setNegativeButton("Cancelar", null).show();
+    }
+
+    // ── Phone login ───────────────────────────────────────────────────────────
+
+    private void signInWithPhone() {
+        startActivity(new Intent(this, PhoneLoginActivity.class));
     }
 
     // ── Forgot password ───────────────────────────────────────────────────────
