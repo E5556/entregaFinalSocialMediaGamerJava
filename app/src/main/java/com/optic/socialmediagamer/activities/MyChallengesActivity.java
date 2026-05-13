@@ -84,6 +84,7 @@ public class MyChallengesActivity extends AppCompatActivity {
                         Challenge c = doc.toObject(Challenge.class);
                         if (c != null) { c.setId(doc.getId()); mChallenges.add(c); }
                     }
+                    mChallenges.sort((a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
                     mAdapter.notifyDataSetChanged();
                     boolean empty = mChallenges.isEmpty();
                     mTextEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);

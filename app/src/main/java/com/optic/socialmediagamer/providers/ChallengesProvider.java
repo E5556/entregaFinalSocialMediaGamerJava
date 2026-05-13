@@ -31,13 +31,11 @@ public class ChallengesProvider {
     }
 
     public Query getSent(String userId) {
-        return mCollection.whereEqualTo("idChallenger", userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING);
+        return mCollection.whereEqualTo("idChallenger", userId);
     }
 
     public Query getReceived(String userId) {
-        return mCollection.whereEqualTo("idChallenged", userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING);
+        return mCollection.whereEqualTo("idChallenged", userId);
     }
 
     public Query getForVoting() {
