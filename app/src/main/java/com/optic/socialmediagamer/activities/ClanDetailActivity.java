@@ -138,12 +138,14 @@ public class ClanDetailActivity extends AppCompatActivity {
 
     private void joinClan() {
         mClanProvider.join(mClanId, mAuthProvider.getUid())
-                .addOnSuccessListener(u -> { Toast.makeText(this, "Te uniste al clan", Toast.LENGTH_SHORT).show(); loadClan(); });
+                .addOnSuccessListener(u -> { Toast.makeText(this, "Te uniste al clan", Toast.LENGTH_SHORT).show(); loadClan(); })
+                .addOnFailureListener(e -> Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show());
     }
 
     private void leaveClan() {
         mClanProvider.leave(mClanId, mAuthProvider.getUid())
-                .addOnSuccessListener(u -> { Toast.makeText(this, "Saliste del clan", Toast.LENGTH_SHORT).show(); finish(); });
+                .addOnSuccessListener(u -> { Toast.makeText(this, "Saliste del clan", Toast.LENGTH_SHORT).show(); finish(); })
+                .addOnFailureListener(e -> Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show());
     }
 
     private void confirmDeleteClan() {
@@ -164,11 +166,16 @@ public class ClanDetailActivity extends AppCompatActivity {
         List<String> members = mClan.getMembers();
         if (members == null || members.isEmpty()) return;
 
+        List<String> officers = mClan.getOfficers() != null ? mClan.getOfficers() : new java.util.ArrayList<>();
+        String myId = mAuthProvider.getUid();
+        boolean isOfficer = officers.contains(myId);
+
         for (String uid : members) {
             mUsersProvider.getUser(uid).addOnSuccessListener(doc -> {
                 String username = doc.exists() && doc.getString("username") != null
                         ? doc.getString("username") : uid;
-                boolean isThisLeader = uid.equals(mClan.getIdLeader());
+                boolean isThisLeader  = uid.equals(mClan.getIdLeader());
+                boolean isThisOfficer = officers.contains(uid);
 
                 LinearLayout row = new LinearLayout(this);
                 row.setOrientation(LinearLayout.HORIZONTAL);
@@ -176,24 +183,55 @@ public class ClanDetailActivity extends AppCompatActivity {
 
                 TextView tvName = new TextView(this);
                 tvName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                tvName.setText((isThisLeader ? "👑 " : "• ") + username);
+                String prefix = isThisLeader ? "👑 " : (isThisOfficer ? "🎖️ " : "• ");
+                tvName.setText(prefix + username);
                 tvName.setTextColor(getColor(R.color.color_text_primary));
                 tvName.setTextSize(14);
                 row.addView(tvName);
 
-                // Kick button: leader can kick non-leaders who aren't themselves
+                // Leader: can promote members to officer, demote officers, kick non-leaders
                 if (isLeader && !isThisLeader) {
+                    if (!isThisOfficer) {
+                        TextView tvPromote = new TextView(this);
+                        tvPromote.setText("PROMOVER");
+                        tvPromote.setTextColor(getColor(R.color.color_primary));
+                        tvPromote.setTextSize(11);
+                        tvPromote.setPadding(8, 0, 8, 0);
+                        tvPromote.setOnClickListener(v -> confirmPromote(uid, username));
+                        row.addView(tvPromote);
+                    } else {
+                        TextView tvDemote = new TextView(this);
+                        tvDemote.setText("DEMOVER");
+                        tvDemote.setTextColor(getColor(android.R.color.holo_orange_light));
+                        tvDemote.setTextSize(11);
+                        tvDemote.setPadding(8, 0, 8, 0);
+                        tvDemote.setOnClickListener(v -> mClanProvider.demoteToMember(mClanId, uid)
+                                .addOnSuccessListener(u -> { Toast.makeText(this, username + " ya no es oficial", Toast.LENGTH_SHORT).show(); loadClan(); }));
+                        row.addView(tvDemote);
+                    }
+
                     TextView tvKick = new TextView(this);
                     tvKick.setText("EXPULSAR");
                     tvKick.setTextColor(getColor(R.color.color_primary));
                     tvKick.setTextSize(11);
+                    tvKick.setPadding(4, 0, 0, 0);
+                    tvKick.setOnClickListener(v -> confirmKick(uid, username));
+                    row.addView(tvKick);
+                }
+
+                // Officer: can kick regular members (not the leader or other officers)
+                if (isOfficer && !isThisLeader && !isThisOfficer && !uid.equals(myId)) {
+                    TextView tvKick = new TextView(this);
+                    tvKick.setText("EXPULSAR");
+                    tvKick.setTextColor(getColor(R.color.color_primary));
+                    tvKick.setTextSize(11);
+                    tvKick.setPadding(8, 0, 0, 0);
                     tvKick.setOnClickListener(v -> confirmKick(uid, username));
                     row.addView(tvKick);
                 }
 
                 mLayoutMembers.addView(row);
 
-                // Add divider
                 View divider = new View(this);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, 1);
@@ -202,6 +240,19 @@ public class ClanDetailActivity extends AppCompatActivity {
                 mLayoutMembers.addView(divider);
             });
         }
+    }
+
+    private void confirmPromote(String uid, String username) {
+        new AlertDialog.Builder(this)
+                .setTitle("Promover a Oficial")
+                .setMessage("¿Promover a " + username + " como 🎖️ Oficial del clan?")
+                .setPositiveButton("PROMOVER", (d, w) ->
+                        mClanProvider.promoteToOfficer(mClanId, uid).addOnSuccessListener(u -> {
+                            Toast.makeText(this, username + " es ahora Oficial 🎖️", Toast.LENGTH_SHORT).show();
+                            loadClan();
+                        }))
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void confirmKick(String uid, String username) {

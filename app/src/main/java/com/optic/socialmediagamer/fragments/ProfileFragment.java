@@ -41,8 +41,10 @@ import com.optic.socialmediagamer.activities.WeeklyChallengeActivity;
 import com.optic.socialmediagamer.activities.WeeklyProgressActivity;
 import com.optic.socialmediagamer.activities.MyChallengesActivity;
 import com.optic.socialmediagamer.activities.WeeklyMissionsActivity;
+import com.optic.socialmediagamer.models.SkillEndorsement;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.BadgeProvider;
+import com.optic.socialmediagamer.providers.EndorsementsProvider;
 import com.optic.socialmediagamer.providers.FollowProvider;
 import com.optic.socialmediagamer.providers.PostProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
@@ -181,6 +183,8 @@ public class ProfileFragment extends Fragment {
 
         mView.findViewById(R.id.layoutMyCollections).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), MyCollectionsActivity.class)));
+
+        mView.findViewById(R.id.layoutMySkills).setOnClickListener(v -> showMySkillsDialog());
 
         SwitchCompat switchDarkMode = mView.findViewById(R.id.switchDarkMode);
         switchDarkMode.setChecked(ThemeHelper.isDarkMode(requireContext()));
@@ -364,6 +368,44 @@ public class ProfileFragment extends Fragment {
             intent.setPackage(null);
         }
         startActivity(intent);
+    }
+
+    private void showMySkillsDialog() {
+        String uid = mAuthProvider.getUid();
+        new EndorsementsProvider().getEndorsementsForUser(uid).addOnSuccessListener(snap -> {
+            if (!isAdded()) return;
+            if (snap.isEmpty()) {
+                new android.app.AlertDialog.Builder(requireContext())
+                        .setTitle("🏷️ Mis Habilidades")
+                        .setMessage("Aún no tienes endorsements.\nOtros gamers pueden endorsarte desde tu perfil público.")
+                        .setPositiveButton("OK", null)
+                        .show();
+                return;
+            }
+
+            java.util.Map<String, Integer> counts = new java.util.HashMap<>();
+            for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                SkillEndorsement e = doc.toObject(SkillEndorsement.class);
+                if (e == null || e.getSkill() == null) continue;
+                counts.put(e.getSkill(), counts.getOrDefault(e.getSkill(), 0) + 1);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (java.util.Map.Entry<String, Integer> entry : counts.entrySet()) {
+                sb.append(SkillEndorsement.getEmoji(entry.getKey()))
+                  .append(" ")
+                  .append(SkillEndorsement.getLabel(entry.getKey()))
+                  .append("  ×")
+                  .append(entry.getValue())
+                  .append("\n");
+            }
+
+            new android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("🏷️ Mis Habilidades (" + snap.size() + " endorsements)")
+                    .setMessage(sb.toString().trim())
+                    .setPositiveButton("OK", null)
+                    .show();
+        });
     }
 
     private void updateXPUI(long xp) {

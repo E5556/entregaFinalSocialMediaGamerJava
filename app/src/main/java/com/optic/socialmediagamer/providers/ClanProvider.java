@@ -63,6 +63,14 @@ public class ClanProvider {
         return mCollection.document(clanId).delete();
     }
 
+    public Task<Void> promoteToOfficer(String clanId, String userId) {
+        return mCollection.document(clanId).update("officers", FieldValue.arrayUnion(userId));
+    }
+
+    public Task<Void> demoteToMember(String clanId, String userId) {
+        return mCollection.document(clanId).update("officers", FieldValue.arrayRemove(userId));
+    }
+
     public Task<Void> addClanXP(String clanId, long amount) {
         Map<String, Object> update = new HashMap<>();
         update.put("clanXp", FieldValue.increment(amount));

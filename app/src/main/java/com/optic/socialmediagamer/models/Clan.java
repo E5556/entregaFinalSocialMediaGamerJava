@@ -15,6 +15,7 @@ public class Clan {
 
     public Clan() {
         members = new ArrayList<>();
+        officers = new ArrayList<>();
     }
 
     public String getId() { return id; }
@@ -33,6 +34,11 @@ public class Clan {
     public void setMembers(List<String> members) { this.members = members; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+    private List<String> officers;
+
+    public List<String> getOfficers() { return officers; }
+    public void setOfficers(List<String> officers) { this.officers = officers; }
 
     private long clanXp;
     public long getClanXp() { return clanXp; }
