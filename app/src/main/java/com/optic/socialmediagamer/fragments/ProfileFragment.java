@@ -32,7 +32,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.optic.socialmediagamer.R;
+import android.graphics.Color;
 import com.optic.socialmediagamer.activities.EditProfileActivity;
+import com.optic.socialmediagamer.activities.GamerShopActivity;
+import com.optic.socialmediagamer.activities.GamerRadarActivity;
 import com.optic.socialmediagamer.activities.MyCollectionsActivity;
 import com.optic.socialmediagamer.activities.ClansActivity;
 import com.optic.socialmediagamer.activities.GamerCardActivity;
@@ -41,6 +44,7 @@ import com.optic.socialmediagamer.activities.WeeklyChallengeActivity;
 import com.optic.socialmediagamer.activities.WeeklyProgressActivity;
 import com.optic.socialmediagamer.activities.MyChallengesActivity;
 import com.optic.socialmediagamer.activities.WeeklyMissionsActivity;
+import com.optic.socialmediagamer.models.ShopItem;
 import com.optic.socialmediagamer.models.SkillEndorsement;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.BadgeProvider;
@@ -186,6 +190,12 @@ public class ProfileFragment extends Fragment {
 
         mView.findViewById(R.id.layoutMySkills).setOnClickListener(v -> showMySkillsDialog());
 
+        mView.findViewById(R.id.layoutGamerShop).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), GamerShopActivity.class)));
+
+        mView.findViewById(R.id.layoutGamerRadar).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), GamerRadarActivity.class)));
+
         SwitchCompat switchDarkMode = mView.findViewById(R.id.switchDarkMode);
         switchDarkMode.setChecked(ThemeHelper.isDarkMode(requireContext()));
         switchDarkMode.setOnCheckedChangeListener((btn, isChecked) ->
@@ -329,6 +339,14 @@ public class ProfileFragment extends Fragment {
                     mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_primary));
                     mEditTextNowPlaying.setText(nowPlaying);
                 }
+                // Apply active cosmetics
+                String activeFrame = documentSnapshot.getString("activeFrame");
+                if (activeFrame != null && !activeFrame.isEmpty()) {
+                    int borderColor = frameColor(activeFrame);
+                    mCircleImageProfile.setBorderColor(borderColor);
+                    mCircleImageProfile.setBorderWidth(6);
+                }
+
                 String twitchUsername = documentSnapshot.getString("twitchUsername");
                 if (twitchUsername != null && !twitchUsername.isEmpty()) {
                     new TwitchProvider().checkIfLive(twitchUsername, (isLive, viewers) -> {
@@ -406,6 +424,15 @@ public class ProfileFragment extends Fragment {
                     .setPositiveButton("OK", null)
                     .show();
         });
+    }
+
+    private int frameColor(String frameId) {
+        switch (frameId) {
+            case ShopItem.FRAME_GOLD:   return Color.parseColor("#FFD700");
+            case ShopItem.FRAME_PURPLE: return Color.parseColor("#BF00FF");
+            case ShopItem.FRAME_NEON:   return Color.parseColor("#00F0FF");
+            default: return requireContext().getColor(R.color.color_primary);
+        }
     }
 
     private void updateXPUI(long xp) {

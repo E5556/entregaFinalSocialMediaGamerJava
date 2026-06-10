@@ -11,6 +11,8 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".GamerApp"
@@ -82,6 +84,15 @@
         <activity android:name=".activities.WeeklyChallengeActivity" />
         <activity android:name=".activities.WeeklyProgressActivity" />
         <activity android:name=".activities.SeasonActivity" />
+        <activity android:name=".activities.GamerShopActivity" />
+        <activity android:name=".activities.ScoutingActivity" />
+        <activity android:name=".activities.GamerRadarActivity" />
+
+        <!-- TODO: Reemplaza YOUR_MAPS_API_KEY con tu clave de Google Maps
+             Obtén una en: https://console.cloud.google.com → APIs → Maps SDK for Android -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_MAPS_API_KEY" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

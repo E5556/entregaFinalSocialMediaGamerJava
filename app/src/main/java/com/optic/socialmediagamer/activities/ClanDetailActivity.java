@@ -32,7 +32,7 @@ public class ClanDetailActivity extends AppCompatActivity {
     TextView mTextViewName, mTextViewTag, mTextViewDescription, mTextViewMemberCount;
     TextView mTextViewDissolvedBanner;
     Button mButtonJoinLeave, mButtonEditDescription, mButtonDeleteClan, mButtonSaveDescription;
-    Button mButtonTransferLeadership;
+    Button mButtonTransferLeadership, mButtonScouting;
     LinearLayout mLayoutMembers, mLayoutEditDescription, mLayoutPending;
     EditText mEditTextNewDescription;
 
@@ -63,6 +63,7 @@ public class ClanDetailActivity extends AppCompatActivity {
         mButtonEditDescription   = findViewById(R.id.buttonEditDescription);
         mButtonDeleteClan        = findViewById(R.id.buttonDeleteClan);
         mButtonTransferLeadership = findViewById(R.id.buttonTransferLeadership);
+        mButtonScouting           = findViewById(R.id.buttonScouting);
         mLayoutMembers           = findViewById(R.id.layoutMembers);
         mLayoutEditDescription   = findViewById(R.id.layoutEditDescription);
         mLayoutPending           = findViewById(R.id.layoutPending);
@@ -146,6 +147,13 @@ public class ClanDetailActivity extends AppCompatActivity {
         mButtonEditDescription.setVisibility(isLeader ? View.VISIBLE : View.GONE);
         mButtonDeleteClan.setVisibility(isLeader ? View.VISIBLE : View.GONE);
         mButtonTransferLeadership.setVisibility(isLeader ? View.VISIBLE : View.GONE);
+        mButtonScouting.setVisibility(isLeader ? View.VISIBLE : View.GONE);
+        mButtonScouting.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, ScoutingActivity.class);
+            intent.putExtra(ScoutingActivity.EXTRA_CLAN_ID, mClanId);
+            intent.putExtra(ScoutingActivity.EXTRA_CLAN_NAME, mClan.getName());
+            startActivity(intent);
+        });
 
         mButtonEditDescription.setOnClickListener(v -> {
             mEditTextNewDescription.setText(mClan.getDescription());

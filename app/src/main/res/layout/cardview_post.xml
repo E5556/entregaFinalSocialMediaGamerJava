@@ -60,6 +60,22 @@
                 android:visibility="gone" />
 
             <TextView
+                android:id="@+id/textViewActiveTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="🎯 Sniper"
+                android:textSize="10sp"
+                android:textColor="@color/color_secondary"
+                android:textStyle="bold"
+                android:background="#1A7700BB"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/textViewLiveDot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

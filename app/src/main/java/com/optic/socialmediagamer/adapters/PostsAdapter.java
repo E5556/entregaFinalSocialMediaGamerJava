@@ -37,6 +37,8 @@ import com.optic.socialmediagamer.providers.TwitchProvider;
 import com.optic.socialmediagamer.providers.CollectionsProvider;
 import com.optic.socialmediagamer.providers.MissionsProvider;
 import com.optic.socialmediagamer.providers.XPProvider;
+import android.graphics.Color;
+import com.optic.socialmediagamer.models.ShopItem;
 import com.optic.socialmediagamer.utils.FCMSender;
 import com.optic.socialmediagamer.utils.RankHelper;
 import com.optic.socialmediagamer.providers.UsersProvider;
@@ -120,6 +122,25 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                     if (twitch != null && !twitch.isEmpty()) {
                         new TwitchProvider().checkIfLive(twitch, (isLive, viewers) ->
                             holder.textViewLiveDot.setVisibility(isLive ? View.VISIBLE : View.GONE));
+                    }
+
+                    // Active title cosmetic
+                    String activeTitle = userDoc.getString("activeTitle");
+                    if (activeTitle != null && !activeTitle.isEmpty()) {
+                        String titleText = titleDisplay(activeTitle);
+                        holder.textViewActiveTitle.setText(titleText);
+                        holder.textViewActiveTitle.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.textViewActiveTitle.setVisibility(View.GONE);
+                    }
+
+                    // Active frame cosmetic
+                    String activeFrame = userDoc.getString("activeFrame");
+                    if (activeFrame != null && !activeFrame.isEmpty()) {
+                        holder.circleImageAuthor.setBorderColor(frameColor(activeFrame));
+                        holder.circleImageAuthor.setBorderWidth(4);
+                    } else {
+                        holder.circleImageAuthor.setBorderWidth(0);
                     }
                 }
             });
@@ -438,7 +459,26 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         return new ViewHolder(view);
     }
 
+    private static String titleDisplay(String titleId) {
+        switch (titleId) {
+            case ShopItem.TITLE_PRO:    return "🎮 Pro Gamer";
+            case ShopItem.TITLE_SNIPER: return "🎯 Sniper de Élite";
+            case ShopItem.TITLE_LEGEND: return "👑 El Inmortal";
+            default: return titleId;
+        }
+    }
+
+    private static int frameColor(String frameId) {
+        switch (frameId) {
+            case ShopItem.FRAME_GOLD:   return Color.parseColor("#FFD700");
+            case ShopItem.FRAME_PURPLE: return Color.parseColor("#BF00FF");
+            case ShopItem.FRAME_NEON:   return Color.parseColor("#00F0FF");
+            default: return Color.parseColor("#0055BB");
+        }
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView textViewActiveTitle;
         TextView textViewTitle;
         TextView textViewDescription;
         ImageView imageViewPost;
@@ -467,6 +507,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
 
         public ViewHolder(View view) {
             super(view);
+            textViewActiveTitle     = view.findViewById(R.id.textViewActiveTitle);
             textViewTitle           = view.findViewById(R.id.textViewTitlePostCard);
             textViewDescription     = view.findViewById(R.id.textViewDescriptionPostCard);
             imageViewPost           = view.findViewById(R.id.imageViewPostCard);

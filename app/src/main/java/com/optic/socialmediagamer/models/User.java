@@ -19,6 +19,9 @@ public class User {
     private String twitchUsername;
     private String nowPlaying;
     private long timestamp;
+    private String activeFrame;
+    private String activeTitle;
+    private String activeBackground;
 
     public User() {
 
@@ -89,6 +92,15 @@ public class User {
 
     public String getNowPlaying() { return nowPlaying; }
     public void setNowPlaying(String nowPlaying) { this.nowPlaying = nowPlaying; }
+
+    public String getActiveFrame() { return activeFrame; }
+    public void setActiveFrame(String activeFrame) { this.activeFrame = activeFrame; }
+
+    public String getActiveTitle() { return activeTitle; }
+    public void setActiveTitle(String activeTitle) { this.activeTitle = activeTitle; }
+
+    public String getActiveBackground() { return activeBackground; }
+    public void setActiveBackground(String activeBackground) { this.activeBackground = activeBackground; }
 
     public long getTimestamp() {
         return timestamp;

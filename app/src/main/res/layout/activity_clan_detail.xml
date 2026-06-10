@@ -178,6 +178,19 @@
                 android:backgroundTint="@color/color_surface_2"
                 android:textColor="@color/color_text_primary"
                 android:visibility="gone"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/buttonScouting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔍 BUSCAR JUGADORES (SCOUTING)"
+                android:fontFamily="monospace"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:backgroundTint="@color/color_secondary"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
                 android:layout_marginBottom="12dp" />
 
             <!-- Pending join requests (leader only) -->

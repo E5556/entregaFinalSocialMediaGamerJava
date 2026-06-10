@@ -94,6 +94,40 @@ public class UsersProvider {
         return cal.getTimeInMillis();
     }
 
+    public Task<Void> setAdmin(String userId, boolean isAdmin) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("isAdmin", isAdmin);
+        return mCollection.document(userId).set(map, SetOptions.merge());
+    }
+
+    public Task<Void> setActiveCosmetic(String userId, String type, String itemId) {
+        String field;
+        switch (type) {
+            case "FRAME":      field = "activeFrame";      break;
+            case "TITLE":      field = "activeTitle";      break;
+            case "BACKGROUND": field = "activeBackground"; break;
+            default: return com.google.android.gms.tasks.Tasks.forException(
+                    new IllegalArgumentException("Unknown type: " + type));
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put(field, itemId);
+        return mCollection.document(userId).set(map, SetOptions.merge());
+    }
+
+    public Task<Void> updateLocation(String userId, double lat, double lng) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("lat", lat);
+        map.put("lng", lng);
+        map.put("locationUpdatedAt", new Date().getTime());
+        return mCollection.document(userId).set(map, SetOptions.merge());
+    }
+
+    public com.google.firebase.firestore.Query getUsersNearby(double lat, double radiusDeg) {
+        return mCollection
+                .whereGreaterThan("lat", lat - radiusDeg)
+                .whereLessThan("lat", lat + radiusDeg);
+    }
+
     public Task<Void> update(User user) {
         Map<String, Object> map = new HashMap<>();
         map.put("username", user.getUsername());
