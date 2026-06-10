@@ -97,6 +97,34 @@
             android:layout_height="160dp"
             android:scaleType="centerCrop" />
 
+        <!-- Video placeholder (visible only when post.hasVideo = true) -->
+        <LinearLayout
+            android:id="@+id/layoutVideoPreview"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@color/color_surface_2"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="▶"
+                android:textSize="48sp"
+                android:textColor="@color/color_primary" />
+
+            <TextView
+                android:id="@+id/textViewPlayVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver video"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
         <!-- Borde superior neón -->
         <View
             android:layout_width="match_parent"

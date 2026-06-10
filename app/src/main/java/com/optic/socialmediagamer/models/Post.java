@@ -12,6 +12,8 @@ public class Post {
     private long timestamp;
     private long likeCount;
     private boolean hasPoll;
+    private String videoUrl;
+    private boolean hasVideo;
 
     public Post() {
 
@@ -97,4 +99,9 @@ public class Post {
 
     public boolean isHasPoll() { return hasPoll; }
     public void setHasPoll(boolean hasPoll) { this.hasPoll = hasPoll; }
+
+    public String getVideoUrl() { return videoUrl; }
+    public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
+    public boolean isHasVideo() { return hasVideo; }
+    public void setHasVideo(boolean hasVideo) { this.hasVideo = hasVideo; }
 }

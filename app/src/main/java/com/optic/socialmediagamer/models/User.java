@@ -2,6 +2,8 @@ package com.optic.socialmediagamer.models;
 
 import com.google.firebase.firestore.PropertyName;
 
+import java.util.List;
+
 public class User {
 
     private String id;
@@ -22,6 +24,7 @@ public class User {
     private String activeFrame;
     private String activeTitle;
     private String activeBackground;
+    private List<String> highlights;
 
     public User() {
 
@@ -101,6 +104,9 @@ public class User {
 
     public String getActiveBackground() { return activeBackground; }
     public void setActiveBackground(String activeBackground) { this.activeBackground = activeBackground; }
+
+    public List<String> getHighlights() { return highlights; }
+    public void setHighlights(List<String> highlights) { this.highlights = highlights; }
 
     public long getTimestamp() {
         return timestamp;

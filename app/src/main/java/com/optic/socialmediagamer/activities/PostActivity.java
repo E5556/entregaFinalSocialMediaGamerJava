@@ -99,6 +99,12 @@ public class PostActivity extends AppCompatActivity {
     TextInputEditText mTextInputPollOptionB;
     PollProvider mPollProvider;
 
+    SwitchCompat mSwitchVideo;
+    LinearLayout mLayoutVideoPost;
+    TextView mTextViewVideoName;
+    Uri mVideoUri;
+    private static final int VIDEO_REQUEST_CODE = 5;
+
     // Modo edición
     boolean mIsEdit = false;
     String mPostId;
@@ -146,6 +152,19 @@ public class PostActivity extends AppCompatActivity {
 
         mSwitchPoll.setOnCheckedChangeListener((btn, checked) ->
             mLayoutPollInputs.setVisibility(checked ? android.view.View.VISIBLE : android.view.View.GONE));
+
+        mSwitchVideo      = findViewById(R.id.switchVideoPost);
+        mLayoutVideoPost  = findViewById(R.id.layoutVideoPost);
+        mTextViewVideoName = findViewById(R.id.textViewVideoName);
+
+        if (mSwitchVideo != null) {
+            mSwitchVideo.setOnCheckedChangeListener((btn, checked) -> {
+                mLayoutVideoPost.setVisibility(checked ? View.VISIBLE : View.GONE);
+                mImageViewPost1.setVisibility(checked ? View.GONE : View.VISIBLE);
+                mImageViewPost2.setVisibility(checked ? View.GONE : View.VISIBLE);
+            });
+            mLayoutVideoPost.setOnClickListener(v -> pickVideo());
+        }
 
         // Verificar si es modo edición
         mIsEdit = getIntent().getBooleanExtra("isEdit", false);
@@ -241,6 +260,15 @@ public class PostActivity extends AppCompatActivity {
                 Toast.makeText(this, "Completa las dos opciones de la encuesta", Toast.LENGTH_SHORT).show();
                 return;
             }
+        }
+
+        if (mSwitchVideo != null && mSwitchVideo.isChecked()) {
+            if (mVideoUri == null) {
+                Toast.makeText(this, "Selecciona un video", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            uploadVideoAndPost();
+            return;
         }
 
         if (mIsEdit) {
@@ -409,6 +437,53 @@ public class PostActivity extends AppCompatActivity {
         });
     }
 
+    private void pickVideo() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        startActivityForResult(intent, VIDEO_REQUEST_CODE);
+    }
+
+    private void uploadVideoAndPost() {
+        mDialog.show();
+        mImageProvider.saveVideo(this, mVideoUri).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                mDialog.dismiss();
+                Toast.makeText(this, "Error al subir video", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mImageProvider.getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
+                saveVideoPost(uri.toString());
+            });
+        });
+    }
+
+    private void saveVideoPost(String videoUrl) {
+        Post post = new Post();
+        post.setVideoUrl(videoUrl);
+        post.setHasVideo(true);
+        post.setImage1("");
+        post.setImage2("");
+        post.setTitle(mTitle);
+        post.setDescription(mDescription);
+        post.setCategory(mCategory);
+        post.setIdUser(mAuthProvider.getUid());
+        post.setTimestamp(new Date().getTime());
+
+        mPostProvider.save(post).addOnCompleteListener(task -> {
+            mDialog.dismiss();
+            if (task.isSuccessful()) {
+                String myId = mAuthProvider.getUid();
+                mXPProvider.addXP(myId, RankHelper.XP_POST_CREATED);
+                new MissionsProvider().incrementProgress(myId, MissionsProvider.TYPE_POST);
+                notifyFollowers(myId, mTitle, post.getId());
+                Toast.makeText(this, "Video publicado ✅", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "No se pudo publicar el video", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void openGallery(int requestCode) {
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
@@ -445,6 +520,13 @@ public class PostActivity extends AppCompatActivity {
             mImageFile2 = null;
             mPhotoFile2 = new File(mAbsolutePhotoPath2);
             Picasso.get().load(mPhotoPath2).into(mImageViewPost2);
+        }
+        if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            mVideoUri = data.getData();
+            if (mTextViewVideoName != null && mVideoUri != null) {
+                String name = mVideoUri.getLastPathSegment();
+                mTextViewVideoName.setText(name != null ? "📹 " + name : "📹 Video seleccionado");
+            }
         }
     }
 }

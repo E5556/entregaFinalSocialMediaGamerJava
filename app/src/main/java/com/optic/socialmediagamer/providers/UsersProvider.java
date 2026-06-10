@@ -8,9 +8,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.optic.socialmediagamer.models.User;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UsersProvider {
@@ -126,6 +128,13 @@ public class UsersProvider {
         return mCollection
                 .whereGreaterThan("lat", lat - radiusDeg)
                 .whereLessThan("lat", lat + radiusDeg);
+    }
+
+    public Task<Void> setHighlight(String userId, int index, String imageUrl) {
+        String field = "highlight" + index;
+        Map<String, Object> map = new HashMap<>();
+        map.put(field, imageUrl);
+        return mCollection.document(userId).set(map, SetOptions.merge());
     }
 
     public Task<Void> update(User user) {

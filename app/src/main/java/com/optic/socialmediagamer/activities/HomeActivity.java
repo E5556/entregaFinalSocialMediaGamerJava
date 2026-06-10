@@ -20,6 +20,7 @@ import com.optic.socialmediagamer.fragments.ProfileFragment;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.NotificationsProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.utils.PresenceManager;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     NotificationsProvider mNotificationsProvider;
     AuthProvider mAuthProvider;
     ListenerRegistration mUnreadListener;
+    PresenceManager mPresenceManager;
 
     HomeFragment         mHomeFragment;
     ExploreFragment      mExploreFragment;
@@ -63,6 +65,17 @@ public class HomeActivity extends AppCompatActivity {
             checkProfileComplete();
             new UsersProvider().updateStreak(mAuthProvider.getUid());
         }
+        String uid = mAuthProvider.getUid();
+        if (uid != null) {
+            mPresenceManager = new PresenceManager(uid);
+            mPresenceManager.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mPresenceManager != null) mPresenceManager.disconnect();
     }
 
     @Override

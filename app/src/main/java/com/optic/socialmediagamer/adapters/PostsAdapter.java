@@ -23,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.activities.PostDetailActivity;
+import com.optic.socialmediagamer.activities.VideoPlayerActivity;
 import com.optic.socialmediagamer.models.Notification;
 import com.optic.socialmediagamer.models.Post;
 import com.optic.socialmediagamer.providers.AuthProvider;
@@ -91,8 +92,22 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
 
         holder.textViewTitle.setText(post.getTitle());
         holder.textViewDescription.setText(post.getDescription());
-        if (post.getImage1() != null && !post.getImage1().isEmpty()) {
-            Picasso.get().load(post.getImage1()).into(holder.imageViewPost);
+
+        if (post.isHasVideo()) {
+            holder.imageViewPost.setVisibility(View.GONE);
+            holder.layoutVideoPreview.setVisibility(View.VISIBLE);
+            holder.layoutVideoPreview.setOnClickListener(v -> {
+                Intent videoIntent = new Intent(context, VideoPlayerActivity.class);
+                videoIntent.putExtra(VideoPlayerActivity.EXTRA_URL, post.getVideoUrl());
+                videoIntent.putExtra(VideoPlayerActivity.EXTRA_TITLE, post.getTitle());
+                context.startActivity(videoIntent);
+            });
+        } else {
+            holder.layoutVideoPreview.setVisibility(View.GONE);
+            holder.imageViewPost.setVisibility(View.VISIBLE);
+            if (post.getImage1() != null && !post.getImage1().isEmpty()) {
+                Picasso.get().load(post.getImage1()).into(holder.imageViewPost);
+            }
         }
 
         holder.textViewAuthorUsername.setText("@gamer");
@@ -482,6 +497,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
         TextView textViewTitle;
         TextView textViewDescription;
         ImageView imageViewPost;
+        LinearLayout layoutVideoPreview;
         ImageView imageViewLike;
         TextView textViewLikeCount;
         TextView textViewCommentCount;
@@ -511,6 +527,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
             textViewTitle           = view.findViewById(R.id.textViewTitlePostCard);
             textViewDescription     = view.findViewById(R.id.textViewDescriptionPostCard);
             imageViewPost           = view.findViewById(R.id.imageViewPostCard);
+            layoutVideoPreview      = view.findViewById(R.id.layoutVideoPreview);
             imageViewLike           = view.findViewById(R.id.imageViewLike);
             textViewLikeCount       = view.findViewById(R.id.textViewLikeCount);
             textViewCommentCount    = view.findViewById(R.id.textViewCommentCount);

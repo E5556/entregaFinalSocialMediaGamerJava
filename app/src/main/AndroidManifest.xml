@@ -87,12 +87,13 @@
         <activity android:name=".activities.GamerShopActivity" />
         <activity android:name=".activities.ScoutingActivity" />
         <activity android:name=".activities.GamerRadarActivity" />
+        <activity android:name=".activities.VideoPlayerActivity" />
 
         <!-- TODO: Reemplaza YOUR_MAPS_API_KEY con tu clave de Google Maps
              Obtén una en: https://console.cloud.google.com → APIs → Maps SDK for Android -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_MAPS_API_KEY" />
+            android:value="AIzaSyBj9gYEq1t0v0MYCPK9-v7C0qQ2P8s76HM" />
 
         <service
             android:name=".services.MyFirebaseMessagingService"

@@ -59,6 +59,13 @@ import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.optic.socialmediagamer.models.Notification;
+import com.optic.socialmediagamer.providers.NotificationsProvider;
+import com.optic.socialmediagamer.utils.FCMSender;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,6 +106,11 @@ public class ProfileFragment extends Fragment {
     TextView mBtnSaveNowPlaying;
     TextView mBtnClearNowPlaying;
 
+    ImageView mImageViewHighlight1, mImageViewHighlight2, mImageViewHighlight3;
+    private static final int HIGHLIGHT_REQUEST_1 = 201;
+    private static final int HIGHLIGHT_REQUEST_2 = 202;
+    private static final int HIGHLIGHT_REQUEST_3 = 203;
+
     UsersProvider mUsersProvider;
     AuthProvider mAuthProvider;
     PostProvider mPostProvider;
@@ -136,6 +148,14 @@ public class ProfileFragment extends Fragment {
         mBtnSaveNowPlaying           = mView.findViewById(R.id.btnSaveNowPlaying);
         mBtnClearNowPlaying          = mView.findViewById(R.id.btnClearNowPlaying);
 
+        mImageViewHighlight1 = mView.findViewById(R.id.imageViewHighlight1);
+        mImageViewHighlight2 = mView.findViewById(R.id.imageViewHighlight2);
+        mImageViewHighlight3 = mView.findViewById(R.id.imageViewHighlight3);
+
+        mView.findViewById(R.id.cardHighlight1).setOnClickListener(v -> pickHighlight(HIGHLIGHT_REQUEST_1));
+        mView.findViewById(R.id.cardHighlight2).setOnClickListener(v -> pickHighlight(HIGHLIGHT_REQUEST_2));
+        mView.findViewById(R.id.cardHighlight3).setOnClickListener(v -> pickHighlight(HIGHLIGHT_REQUEST_3));
+
         mBtnEditNowPlaying.setOnClickListener(v ->
             mLayoutNowPlayingEdit.setVisibility(
                 mLayoutNowPlayingEdit.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
@@ -143,10 +163,12 @@ public class ProfileFragment extends Fragment {
         mBtnSaveNowPlaying.setOnClickListener(v -> {
             String game = mEditTextNowPlaying.getText().toString().trim();
             if (game.isEmpty()) { Toast.makeText(getContext(), "Escribe el nombre del juego", Toast.LENGTH_SHORT).show(); return; }
-            mUsersProvider.setNowPlaying(mAuthProvider.getUid(), game).addOnSuccessListener(u -> {
+            String myUid = mAuthProvider.getUid();
+            mUsersProvider.setNowPlaying(myUid, game).addOnSuccessListener(u -> {
                 mTextViewNowPlayingDisplay.setText("🎮 " + game);
                 mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_primary));
                 mLayoutNowPlayingEdit.setVisibility(View.GONE);
+                notifyFollowersSameGame(myUid, game);
             });
         });
 
@@ -339,6 +361,15 @@ public class ProfileFragment extends Fragment {
                     mTextViewNowPlayingDisplay.setTextColor(requireContext().getColor(R.color.color_primary));
                     mEditTextNowPlaying.setText(nowPlaying);
                 }
+                // Load highlight images
+                for (int hi = 1; hi <= 3; hi++) {
+                    String hUrl = documentSnapshot.getString("highlight" + hi);
+                    if (hUrl != null && !hUrl.isEmpty()) {
+                        ImageView iv = hi == 1 ? mImageViewHighlight1 : hi == 2 ? mImageViewHighlight2 : mImageViewHighlight3;
+                        if (iv != null) Picasso.get().load(hUrl).placeholder(R.drawable.upload_image).into(iv);
+                    }
+                }
+
                 // Apply active cosmetics
                 String activeFrame = documentSnapshot.getString("activeFrame");
                 if (activeFrame != null && !activeFrame.isEmpty()) {
@@ -446,5 +477,76 @@ public class ProfileFragment extends Fragment {
         } else {
             mTextViewXPNextRank.setText("Siguiente rango: " + next + " XP");
         }
+    }
+
+    private void pickHighlight(int requestCode) {
+        android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != android.app.Activity.RESULT_OK || data == null || data.getData() == null) return;
+        android.net.Uri uri = data.getData();
+        int index = requestCode == HIGHLIGHT_REQUEST_1 ? 1 : requestCode == HIGHLIGHT_REQUEST_2 ? 2 : 3;
+        ImageView target = index == 1 ? mImageViewHighlight1 : index == 2 ? mImageViewHighlight2 : mImageViewHighlight3;
+
+        com.optic.socialmediagamer.providers.ImageProvider imgProvider = new com.optic.socialmediagamer.providers.ImageProvider();
+        imgProvider.saveStoryImage(uri).addOnSuccessListener(snapshot -> {
+            imgProvider.getStorage().getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                String url = downloadUri.toString();
+                mUsersProvider.setHighlight(mAuthProvider.getUid(), index, url);
+                if (target != null) Picasso.get().load(url).into(target);
+            });
+        });
+    }
+
+    private void notifyFollowersSameGame(String myUid, String game) {
+        mUsersProvider.getUser(myUid).addOnSuccessListener(myDoc -> {
+            String myUsername = myDoc.exists() && myDoc.getString("username") != null
+                    ? myDoc.getString("username") : "alguien";
+
+            // Get my followers (people following me)
+            mFollowProvider.getFollowers(myUid).get().addOnSuccessListener(followerSnap -> {
+                if (followerSnap.isEmpty()) return;
+
+                List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+                List<String> followerIds = new ArrayList<>();
+                for (QueryDocumentSnapshot doc : followerSnap) {
+                    String fId = doc.getString("idFollower");
+                    if (fId != null) { followerIds.add(fId); tasks.add(mUsersProvider.getUser(fId)); }
+                }
+
+                Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+                    NotificationsProvider notifProvider = new NotificationsProvider();
+                    for (int i = 0; i < results.size(); i++) {
+                        DocumentSnapshot fDoc = (DocumentSnapshot) results.get(i);
+                        if (!fDoc.exists()) continue;
+                        String fNowPlaying = fDoc.getString("nowPlaying");
+                        if (fNowPlaying == null || !fNowPlaying.equalsIgnoreCase(game)) continue;
+
+                        // Follower plays the same game — notify them
+                        String fId = followerIds.get(i);
+                        Notification notif = new Notification();
+                        notif.setType("now_playing_match");
+                        notif.setIdFrom(myUid);
+                        notif.setIdTo(fId);
+                        notif.setBody("@" + myUsername + " también está jugando " + game + " ¡Únanse!");
+                        notif.setRead(false);
+                        notif.setTimestamp(new Date().getTime());
+                        notifProvider.save(notif);
+
+                        String fcmToken = fDoc.getString("fcmToken");
+                        if (fcmToken != null && !fcmToken.isEmpty() && getContext() != null) {
+                            FCMSender.send(getContext(), fcmToken,
+                                    "¡" + game + " en línea!",
+                                    "@" + myUsername + " también está jugando " + game);
+                        }
+                    }
+                });
+            });
+        });
     }
 }

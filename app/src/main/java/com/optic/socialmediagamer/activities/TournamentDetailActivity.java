@@ -16,10 +16,13 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.optic.socialmediagamer.R;
 import com.optic.socialmediagamer.models.Tournament;
+import com.optic.socialmediagamer.models.ActivityFeedItem;
+import com.optic.socialmediagamer.providers.ActivityFeedProvider;
 import com.optic.socialmediagamer.providers.AuthProvider;
 import com.optic.socialmediagamer.providers.ClanProvider;
 import com.optic.socialmediagamer.providers.TournamentProvider;
 import com.optic.socialmediagamer.providers.UsersProvider;
+import com.optic.socialmediagamer.views.BracketView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -145,38 +148,51 @@ public class TournamentDetailActivity extends AppCompatActivity {
     private void renderBracket() {
         mLayoutBracket.removeAllViews();
         List<String> bracket = mTournament.getBracket();
-        for (int i = 0; i < bracket.size(); i++) {
+
+        // Collect all match data then build BracketView once all names are resolved
+        List<BracketView.Match> matches = new ArrayList<>();
+        int total = bracket.size();
+        final int[] resolved = {0};
+
+        BracketView bracketView = new BracketView(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        bracketView.setLayoutParams(lp);
+
+        // Pre-fill with placeholders
+        for (int i = 0; i < total; i++) matches.add(new BracketView.Match("…", "…"));
+
+        for (int i = 0; i < total; i++) {
+            final int idx = i;
             String[] pair = bracket.get(i).split("\\|");
             String uid1 = pair[0];
             String uid2 = pair.length > 1 ? pair[1] : "BYE";
 
-            fetchPairNames(uid1, uid2, i + 1);
-        }
-    }
-
-    private void fetchPairNames(String uid1, String uid2, int matchNum) {
-        mUsersProvider.getUser(uid1).addOnSuccessListener(doc1 -> {
-            String name1 = doc1.exists() && doc1.getString("username") != null
-                    ? "@" + doc1.getString("username") : uid1;
-            if ("BYE".equals(uid2)) {
-                addMatchRow(matchNum, name1, "BYE (pase directo)");
-                return;
-            }
-            mUsersProvider.getUser(uid2).addOnSuccessListener(doc2 -> {
-                String name2 = doc2.exists() && doc2.getString("username") != null
-                        ? "@" + doc2.getString("username") : uid2;
-                addMatchRow(matchNum, name1, name2);
+            mUsersProvider.getUser(uid1).addOnSuccessListener(doc1 -> {
+                String name1 = doc1.exists() && doc1.getString("username") != null
+                        ? "@" + doc1.getString("username") : uid1;
+                if ("BYE".equals(uid2)) {
+                    matches.set(idx, new BracketView.Match(name1, "BYE"));
+                    resolved[0]++;
+                    if (resolved[0] == total) {
+                        bracketView.setMatches(matches);
+                        mLayoutBracket.addView(bracketView);
+                    }
+                    return;
+                }
+                mUsersProvider.getUser(uid2).addOnSuccessListener(doc2 -> {
+                    String name2 = doc2.exists() && doc2.getString("username") != null
+                            ? "@" + doc2.getString("username") : uid2;
+                    matches.set(idx, new BracketView.Match(name1, name2));
+                    resolved[0]++;
+                    if (resolved[0] == total) {
+                        bracketView.setMatches(matches);
+                        mLayoutBracket.addView(bracketView);
+                    }
+                });
             });
-        });
-    }
-
-    private void addMatchRow(int matchNum, String p1, String p2) {
-        TextView tv = new TextView(this);
-        tv.setText("  Match " + matchNum + ":  " + p1 + "  ⚔️  " + p2);
-        tv.setTextColor(Color.parseColor("#E0E0E0"));
-        tv.setTextSize(13f);
-        tv.setPadding(0, 6, 0, 6);
-        mLayoutBracket.addView(tv);
+        }
     }
 
     private void renderParticipants() {
@@ -209,7 +225,8 @@ public class TournamentDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(u -> {
                     Toast.makeText(this, "¡Inscrito en el torneo! ⚔️", Toast.LENGTH_SHORT).show();
                     loadTournament();
-                });
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show());
     }
 
     private void leaveTournament() {
@@ -217,7 +234,8 @@ public class TournamentDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(u -> {
                     Toast.makeText(this, "Saliste del torneo", Toast.LENGTH_SHORT).show();
                     loadTournament();
-                });
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show());
     }
 
     private void startTournament() {
@@ -253,6 +271,18 @@ public class TournamentDetailActivity extends AppCompatActivity {
                                 .addOnSuccessListener(u -> {
                                     Toast.makeText(this, "🏆 ¡" + usernames[which] + " ganó el torneo!", Toast.LENGTH_LONG).show();
                                     mClanProvider.awardClanXPForUser(winnerUid, 50);
+                                    // Activity feed
+                                    mUsersProvider.getUser(winnerUid).addOnSuccessListener(wDoc -> {
+                                        String wUsername = wDoc.exists() && wDoc.getString("username") != null
+                                                ? wDoc.getString("username") : winnerName;
+                                        ActivityFeedItem feedItem = new ActivityFeedItem();
+                                        feedItem.setIdUser(winnerUid);
+                                        feedItem.setUsername(wUsername);
+                                        feedItem.setType("TOURNAMENT_WIN");
+                                        feedItem.setMessage("ganó el torneo de " + mTournament.getGame());
+                                        feedItem.setTimestamp(System.currentTimeMillis());
+                                        new ActivityFeedProvider().save(feedItem);
+                                    });
                                     loadTournament();
                                 });
                     }).show();

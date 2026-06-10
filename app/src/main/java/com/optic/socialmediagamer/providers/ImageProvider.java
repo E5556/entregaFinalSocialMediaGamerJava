@@ -1,6 +1,7 @@
 package com.optic.socialmediagamer.providers;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -21,7 +22,7 @@ public class ImageProvider {
 
     public UploadTask save(Context context, File file) {
         byte[] imageByte = CompressorBitmapImage.getImage(context, file.getPath(), 500, 500);
-        StorageReference storage = FirebaseStorage.getInstance().getReference().child(new Date() + ".jpg");
+        StorageReference storage = FirebaseStorage.getInstance().getReference().child(new Date().getTime() + ".jpg");
         mStorage = storage;
         UploadTask task = storage.putBytes(imageByte);
         return task;
@@ -29,6 +30,20 @@ public class ImageProvider {
 
     public StorageReference getStorage() {
         return mStorage;
+    }
+
+    public UploadTask saveStoryImage(Uri uri) {
+        StorageReference storage = FirebaseStorage.getInstance().getReference()
+                .child("stories/" + new Date().getTime() + ".jpg");
+        mStorage = storage;
+        return storage.putFile(uri);
+    }
+
+    public UploadTask saveVideo(Context context, Uri uri) {
+        StorageReference storage = FirebaseStorage.getInstance().getReference()
+                .child("videos/" + new Date().getTime() + ".mp4");
+        mStorage = storage;
+        return storage.putFile(uri);
     }
 
 }
